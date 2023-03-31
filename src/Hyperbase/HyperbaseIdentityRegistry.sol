@@ -7,7 +7,7 @@ import '.././Interface/IHyperbaseIdentityRegistry.sol';
 contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 
   	////////////////
-    // STATE
+    // CONSTANTS
     ////////////////
 
     // Enumerated list of countries
@@ -209,6 +209,10 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 		Zambia,
 		Zimbabwe
 	}
+
+  	////////////////
+    // STATE
+    ////////////////
 
     // Identity fields
     struct Identity {
