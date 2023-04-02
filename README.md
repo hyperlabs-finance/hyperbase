@@ -6,8 +6,7 @@ It is our conclusion that for blockchain-based applications to achieve mainstrea
 
 ## Barriers to Adoption
 
-### User Experience 
-Despite its vast potential, the blockchain remains arcane and inaccessible to outsiders. Although the potential of blockchain technology is increasingly recognised across industries the typical approach to building applications has changed remarkably little. Even in 2023, blockchain applications make little provision for non-technical users. This design philosophy is best categorised as: “by developers, for developers”. 
+Although the potential of blockchain technology is increasingly recognised across industries the typical approach to building applications has changed remarkably little. Even in 2023, blockchain applications make little provision for non-technical users. This design philosophy is best categorised as: “by developers, for developers”. 
 
 #### Application Design
 The vast majority of blockchain applications seem more like control panels than consumer-ready apps. Accompanying applications is little in the way of walkthroughs or guidance. While this may be adequate for tech-savvy early-adopters or “degens”, for the average user such experiences are generally off-putting. 
@@ -16,24 +15,15 @@ The vast majority of blockchain applications seem more like control panels than 
 Although 42-character public keys may be easily parsed by machines, to humans they are nearly incomprehensible. If an address is wrong even by a single character then funds and assets may be lost permanently. Public keys contribute to a feeling of overwhelm that is often enough to discourage newcomers
 
 #### Pseudonymity
-In the current paradigm, accounts are made and disposed of at will. Privacy may be of great importance, however, the throwaway nature of blockchain accounts has prevented the space from evolving. Without being able to make any meaningful assumptions about the person behind the account it has proven impractical to create user-oriented experiences. 
+In the current paradigm, accounts are made and disposed of at will. Without being able to make any meaningful assumptions about the person behind the account it has proven impractical to create user-oriented experiences. Privacy may be of great importance but the throwaway nature of accounts has prevented the space from evolving. 
 
 #### Private Keys
 Digital wallets are typically secured by a private key that must not be lost or shared under any circumstances. If a user loses or has their private key stolen the funds can be compromised. This creates the essential problem of smart wallet security: a private key must be backed up in case it is lost, but not so much that it may be more easily compromised
 
 #### Onboarding
-In the blockchain ecosystem, onboarding is almost always tedious and frustrating. Gas fees introduce significant friction to the onboarding process, and KYC procedures often require users to go through a number of additional steps beforehand. In combination with a lack of understanding as to why these steps are necessary, onboarding typically results in a high number of dropouts.
+In the blockchain ecosystem, onboarding is almost always tedious and frustrating. Gas fees introduce significant friction to the onboarding process and KYC procedures often require users to go through a number of additional steps beforehand. In combination with a lack of understanding as to why these steps are necessary onboarding typically results in a high number of dropouts.
 
-## Digital Identities
-
-As a platform for regulated interactions, identity plays a fundamental role in the Hypersurface protocol. Identity is crucial in allowing (1) users to engage with one another online with confidence, (2) creating binding legal agreements between parties and (3) enabling smart contracts to validate credentials, thereby automating the process of compliance. 
-
-{... More here }
-The solution is to use verifiable digital identities. 
-
-Verifiable digital identities create a powerful resource that enable users to engage broadly across investment, ownership, and governance on the blockchain. Identities are persistent, meaning they may only need to be verified once to open an entire network of opportunities. In this sense, an identity account can be thought of as like a digital ID card. Not only is it valid across opportunities but with further standardisation it may be used across the blockchain ecosystem. 
-
-Blockchain-based identity accounts enable information to be verified near-instantly by smart contracts. This has significant implications for issuers as it enables the process of compliance and transfers controls to be automated and enforced at the protocol level. With trust secured by a tamper-proof digital environment, compliant parties can participate with greatly reduced friction. There have been a variety of notable attempts over the years to create digital accounts, all of which have fallen short in one way or another. Ideally, accounts would be secure, self-sovereign, identity-driven, and more broadly compatible with the blockchain ecosystem—all while maintaining the simplicity to onboard first-time users.
+# Hyperbase Accounts
 
 {.... Should this go to the introduction ?}
 
@@ -107,6 +97,19 @@ i. A new local key is generated and stored on the device.
 ii. A new Hyperbase is deployed to the blockchain
 via relay, with the local key added as having top-level privileges.
 iii. The user-selected ENS subdomain is registered to the user's account address.
+
+## Digital Identities
+
+As a platform for regulated interactions, identity plays a fundamental role in the Hypersurface protocol. Identity is crucial in allowing (1) users to engage with one another online with confidence, (2) creating binding legal agreements between parties and (3) enabling smart contracts to validate credentials, thereby automating the process of compliance. 
+
+{... More here }
+The solution is to use verifiable digital identities. 
+
+Verifiable digital identities create a powerful resource that enable users to engage broadly across investment, ownership, and governance on the blockchain. Identities are persistent, meaning they may only need to be verified once to open an entire network of opportunities. In this sense, an identity account can be thought of as like a digital ID card. Not only is it valid across opportunities but with further standardisation it may be used across the blockchain ecosystem. 
+
+Blockchain-based identity accounts enable information to be verified near-instantly by smart contracts. This has significant implications for issuers as it enables the process of compliance and transfers controls to be automated and enforced at the protocol level. With trust secured by a tamper-proof digital environment, compliant parties can participate with greatly reduced friction. There have been a variety of notable attempts over the years to create digital accounts, all of which have fallen short in one way or another. Ideally, accounts would be secure, self-sovereign, identity-driven, and more broadly compatible with the blockchain ecosystem—all while maintaining the simplicity to onboard first-time users.
+
+{unlike traditional standards like the ERC 735, is backwards compatible with EOAs}
 
 ## Claims
 
