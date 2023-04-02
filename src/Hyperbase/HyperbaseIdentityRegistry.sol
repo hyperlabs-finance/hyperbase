@@ -218,7 +218,7 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
     struct Identity {
 		bool exists;
         Country country;
-		// #TODO any more pertinant fields? Hashed name for example?
+		// #TODO any more pertinant fields? Hashed name for example? Multiple accounts on an identity?
     }
 
 	// Array of identities

@@ -9,10 +9,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry {
   	////////////////
     // STATE
     ////////////////
-    
-    mapping(address => mapping(bytes32 => Claim)) internal _claimsByIdBySubject;
-    mapping(address => mapping(uint256 => bytes32[])) internal _claimIdsByTopicsBySubject; 
-    mapping(bytes => bool) public _revokedBySig;
+
+    // CLAIMS
 
     struct Claim {
         uint256 topic;
@@ -23,6 +21,18 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry {
         bytes data;
         string uri;
     }
+
+    mapping(address => mapping(bytes32 => Claim)) internal _claimsByIdBySubject;
+    mapping(address => mapping(uint256 => bytes32[])) internal _claimIdsByTopicsBySubject; 
+    mapping(bytes => bool) public _revokedBySig;
+
+    // TRUSTED VERIFIERS
+
+    // Array of all trusted _verifiers i.e. kyc agents, etc
+    address[] public _verifiers;
+
+    // Mapping between a trusted verifier address and the corresponding topics it's trusted to verify i.e. Accredited, HNWI, etc.
+    mapping(address => uint256[]) public _verifierTrustedTopics;
 
     ////////////////////////////////////////////////////////////////
     // ADD | REMOVE | REVOKE CLAIMS
@@ -144,6 +154,80 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry {
         return true;
     }
     
+    //////////////////////////////////////////////
+    // ADD | REMOVE VERIFIER
+    //////////////////////////////////////////////
+
+    // Add a trusted verifier
+    function addTrustedVerifier(
+        address verifier,
+        uint256[] calldata trustedTopics
+    )
+        external
+        override
+        onlyOwner
+    {
+        // Sanity checks
+        require(_verifierTrustedTopics[verifier].length == 0, "Trusted Verifier already exists");
+        require(trustedTopics.length > 0, "Trusted claim topics cannot be empty");
+
+        // Add verifier
+        _verifiers.push(verifier);
+
+        // Add trusted topics
+        _verifierTrustedTopics[verifier] = trustedTopics;
+
+        // Event
+        emit TrustedVerifierAdded(verifier, trustedTopics);
+    }
+
+    // Remove a trusted verifier 
+    function removeTrustedVerifier(
+        address verifier
+    )
+        external
+        override
+        onlyOwner
+    {
+        // Sanity checks
+        require(_verifierTrustedTopics[verifier].length != 0, "Verifier doesn't exist");
+
+        // Iterate through and remove
+        for (uint256 i = 0; i < _verifiers.length; i++) {
+            if (_verifiers[i] == verifier) {
+                _verifiers[i] = _verifiers[_verifiers.length - 1];
+                _verifiers.pop();
+                break;
+            }
+        }
+
+        // Delete from 
+        delete _verifierTrustedTopics[verifier];
+
+        // Event
+        emit TrustedVerifierRemoved(verifier);
+    }
+
+    // Update the topics a verifier can verify on
+    function updateVerifierClaimTopics(
+        address verifier,
+        uint256[] calldata trustedTopics
+    )
+        external
+        override
+        onlyOwner
+    {
+        // Sanity checks
+        require(_verifierTrustedTopics[verifier].length != 0, "Verifier doesn't exist");
+        require(trustedTopics.length > 0, "Claims topics cannot be empty");
+
+        // Update
+        _verifierTrustedTopics[verifier] = trustedTopics;
+
+        // Event
+        emit ClaimTopicsUpdated(verifier, trustedTopics);
+    }
+    
     ////////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////////
@@ -184,6 +268,41 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry {
         returns(bytes32[] memory claimIds)
     {
         return _claimIdsByTopicsBySubject[subject][topic];
+    }
+
+    // Get address from sig
+    function getRecoveredAddress(
+        bytes memory sig,
+        bytes32 dataHash
+    )
+        public
+        override
+        pure
+        returns (address addr)
+    {
+        bytes32 ra;
+        bytes32 sa;
+        uint8 va;
+
+        // Check the sig length
+        if (sig.length != 65) {
+            return address(0);
+        }
+
+        // Divide the sig in r, s and v variables
+        assembly {
+            ra := mload(add(sig, 32))
+            sa := mload(add(sig, 64))
+            va := byte(0, mload(add(sig, 96)))
+        }
+
+        if (va < 27) {
+            va += 27;
+        }
+
+        address recoveredAddress = ecrecover(dataHash, va, ra, sa);
+
+        return (recoveredAddress);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -249,41 +368,41 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry {
 
         return false;
     }
-
-
-    // Get address from sig
-    function getRecoveredAddress(
-        bytes memory sig,
-        bytes32 dataHash
+    
+    // Checks if address is verifier
+    function checkIsVerifier(
+        address verifier
     )
-        public
+        external
+        view
         override
-        pure
-        returns (address addr)
+        returns (bool)
     {
-        bytes32 ra;
-        bytes32 sa;
-        uint8 va;
-
-        // Check the sig length
-        if (sig.length != 65) {
-            return address(0);
+        for (uint256 i = 0; i < _verifiers.length; i++) {
+            if (_verifiers[i] == verifier) {
+                return true;
+            }
         }
+        return false;
+    }
 
-        // Divide the sig in r, s and v variables
-        assembly {
-            ra := mload(add(sig, 32))
-            sa := mload(add(sig, 64))
-            va := byte(0, mload(add(sig, 96)))
+    // Account has claim topic
+    function checkIsVerifierTrustedTopic(
+        address verifier,
+        uint256 topic
+    )
+        external
+        view
+        override
+        returns (bool)
+    {
+        // Iterate through checking for claim topic
+        for (uint256 i = 0; i < _verifierTrustedTopics[verifier].length; i++) {
+            if (_verifierTrustedTopics[verifier][i] == topic) {
+                return true;
+            }
         }
-
-        if (va < 27) {
-            va += 27;
-        }
-
-        address recoveredAddress = ecrecover(dataHash, va, ra, sa);
-
-        return (recoveredAddress);
+        return false;
     }
 
 }

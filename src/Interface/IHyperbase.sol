@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity ^0.8.6;
+
 interface IHyperbase {
 	
-    
     event KeyAdded(bytes32 indexed key, uint256 indexed purpose, uint256 indexed keyType);
     event KeyRemoved(bytes32 indexed key, uint256 indexed purpose, uint256 indexed keyType);
     event ExecutionRequested(uint256 indexed executionId, address indexed to, uint256 indexed value, bytes data);
