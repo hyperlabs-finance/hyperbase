@@ -139,4 +139,3 @@ c. A citizen of a given jurisdiction.
 6. When a share transfer is attempted to the prospective investor the compliance smart contract verifies the receiver's claims and approves the transfer.
 
 Beyond whitelisting, claims serve to add fidelity to interactions, allowing issuers to permit transfers automatically. Whereas previously issuers would have required complete control and would manually verify who becomes a shareholder, claims allow issuers to specify terms that shareholders must meet before they are eligible to receive shares. This enables issuers to automate transfers, which we believe will enable for greatly enhanced transferability and liquidity.
-
