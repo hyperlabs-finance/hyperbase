@@ -33,8 +33,14 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     // STATE
     ////////////////
 
+    struct Key {
+        bytes32 key;
+        uint256 purpose; //e.g., MANAGEMENT_KEY = 1, ACTION_KEY = 2, etc.
+        bool exists;
+    }
+
 	// All keys on the acapprovalCount
-    address[] public _keys;
+    Key[] public _keys;
 
 	// Mapping from address to is key bool y/n
     mapping(address => bool) public _isKey;
@@ -86,8 +92,9 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 	)
 		ERC2771Context(forwarder)
 	{
-		_keys.push(_msgSender());
-		_isKey[_msgSender()] = true;
+		_keys[_msgSender()].key = _msgSender();
+		_keys[_msgSender()].exists = true;
+		_keys[_msgSender()].purpose = 1;
 	}
 
   	////////////////
@@ -102,14 +109,14 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     modifier keyDoesNotExist(
 		address key
 	) {
-        require(!_isKey[key]);
+        require(!_keys[key].exists);
         _;
     }
 
     modifier keyExists(
 		address key
 	) {
-        require(_isKey[key]);
+        require(_keys[key].exists);
         _;
     }
 
@@ -177,7 +184,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         notNull(key)
         validRequirement(_keys.length + 1, _required)
     {
-        _isKey[key] = true;
+        _keys[key].exists = true;
         _keys.push(key);
         emit KeyAdded(key);
     }
@@ -190,7 +197,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         onlyThis
         keyExists(key)
     {
-        _isKey[key] = false;
+        _keys[key].exists = false;
         for (uint256 i=0; i<_keys.length - 1; i++)
             if (_keys[i] == key) {
                 _keys[i] = _keys[_keys.length - 1];
@@ -212,12 +219,14 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         keyExists(key)
         keyDoesNotExist(newKey)
     {
+        // #TODO: refactor this
+        
         for (uint256 i=0; i<_keys.length; i++)
             if (_keys[i] == key) {
                 _keys[i] = newKey;
                 break;
             }
-        _isKey[key] = false;
+        _keys[key].exists = false;
         emit KeyRemoved(key);
 
         _isKey[newKey] = true;
@@ -457,6 +466,21 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         else return false;
     }
 
+    // Check key permissions
+    function checkKeyHasPurpose(
+        bytes32 key,
+        uint256 purpose
+    )
+        public
+        view
+        returns(bool result)
+    {
+        bool isThere;
+        if (_keys[key].key == 0) return false;
+        isThere = _keys[key].purpose <= purpose;
+        return isThere;
+    }
+
     //////////////////////////////////////////////
     // GETTERS
     //////////////////////////////////////////////
@@ -472,6 +496,40 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     {
         return MAX_KEY_COUNT;
     }
+
+    // Returns list of `_keys`.
+    function getKeys()
+        public
+        view
+        returns (address[])
+    {
+        return _keys;
+    }
+    
+    function getKey(bytes32 _key)
+        public
+        view
+        returns(uint256 purpose, uint256 keyType, bytes32 key)
+    {
+        return (keys[_key].purpose, keys[_key].keyType, keys[_key].key);
+    }
+
+    function getKeyPurpose(bytes32 _key)
+        public
+        view
+        returns(uint256 purpose)
+    {
+        return (keys[_key].purpose);
+    }
+
+    function getKeysByPurpose(uint256 _purpose)
+        public
+        view
+        returns(bytes32[] _keys)
+    {
+        return keysByPurpose[_purpose];
+    }
+
 
     // The transaction hash is is produced by hashing the `targets` array, the `values` array and the `calldatas` array.
     function getTransactionHash(
@@ -507,15 +565,6 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         for (uint256 i=0; i< _metaTx.length; i++)
             if (pending && !_metaTx[i].status || executed && _metaTx[i].status)
                 approvalCount++;
-    }
-
-    // Returns list of `_keys`.
-    function getKeys()
-        public
-        view
-        returns (address[])
-    {
-        return _keys;
     }
 
     // Returns array with `_key` addresses that confirmed transaction.
