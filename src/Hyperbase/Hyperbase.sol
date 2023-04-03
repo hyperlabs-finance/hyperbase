@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.6;
 
-import 'openzeppelin-contracts/contracts/metatx/ERC2771Context.sol';
+import 'openzeppelin-contracts/contracts/tx/ERC2771Context.sol';
 import 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 
 import '../Interface/IHyperbase.sol';
@@ -23,7 +23,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     // CONSTANTS
     ////////////////
 
-    // Maximum keys
+    // 
     address GAS_TOKEN;
 
     // Maximum keys
@@ -34,9 +34,9 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 
     // Determines what types of tx the key can submit/approve 
     enum Purpose {
-        MANAGEMENT;
-        ACTION;
-        CLAIM;
+        MANAGEMENT,
+        ACTION,
+        CLAIM
     }
     
     // Execution status
@@ -44,7 +44,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         PENDING,
         CANCELLED,
         SUBMITTED,
-        SUCEEDED,
+        EXECUTED,
         FAILED
     }
 
@@ -61,7 +61,10 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 	// All keys on the acapprovalCount
     Key[] public _keys;
 
-    // Mapping from purpose const to 
+    // Mapping from 
+    mapping (uint256 => uint256[]) _keysByPurpose;
+
+    // Mapping from purpose const to amount of sigs required
     mapping(Purpose => uint256) _requiredByPurpose;
 
     // Core transaction details
@@ -115,6 +118,21 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 	
     modifier onlyThis() {
         require(_msgSender() == address(this));
+        _;
+    }
+
+    modifier onlyManagement() {
+        require(uint8(Purpose.MANAGEMENT) =< uint8(_keys[_msgSender()].purpose));
+        _;
+    }
+
+    modifier onlyAction() {
+        require(uint8(Purpose.ACTION) =< uint8(_keys[_msgSender()].purpose));
+        _;
+    }
+
+    modifier onlyClaims() {
+        require(uint8(Purpose.CLAIMS) =< uint8(_keys[_msgSender()].purpose));
         _;
     }
 
@@ -218,19 +236,17 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         onlyThis
         keyExists(key)
     {
-        // #TODO: refactor this
-
-        // Check that the key being removed does not result in the account being locked
+        // Sanity checks
+        require(1 < _keys.length, "Hyperbase: Cannot have zero keys");
         
-        _keys[key].exists = false;
-        for (uint256 i=0; i<_keys.length - 1; i++)
-            if (_keys[i] == key) {
-                _keys[i] = _keys[_keys.length - 1];
-                break;
-            }
-        _keys.length -= 1;
+        // Delete key
+        _keys[key].pop();
+
+        // Reset requirement
         if (_required > _keys.length)
             setRequirement(_keys.length);
+
+        // Event
         emit KeyRemoved(key);
     }
 
@@ -257,15 +273,13 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 
     // Submit a transaction to execute on the account
     function submit(
-        address GAS_TOKEN,
-        uint256 gasPrice,
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas
     )
 		public
         keyHasRequiredPurpose(_msgSender(), targets, values, calldatas)
-		returns (uint256)
+		returns (uint256, uint256)
 	{
         // Sanity checks
         require(targets.length > 0, "Hyperbase: empty transaction");
@@ -276,10 +290,9 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         // Hash the tx
         uint256 txHash = getTransactionHash(targets, values, calldatas);
 
-        // #TODO: Determine the purpose by the op type
-        if (target == address(this)) 
-            Purpose purpose = Purpose.MANAGEMENT; // calling Self should be only be with MANAGEMENT_KEY
-        else if (target == address(_claimRegistry) && callDatas == /* #TODO add claim */)
+        Purpose purpose = getRequiredPermissions(
+            targets, values, calldatas
+        );
 
         // Get the block times for now and transaction expiry
         uint64 submitted = block.number.toUint64();
@@ -287,11 +300,15 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 
         // If tx exsists then reset/update its fields
         if (0 < _transactionByHash[txHash]) {
-            _transaction[_transactionByHash[txHash]].gasPrice;
-            _transaction[_transactionByHash[txHash]].GAS_TOKEN;
+
             _transaction[_transactionByHash[txHash]].purpose = purpose;
             _transaction[_transactionByHash[txHash]].submitted = submitted;
             _transaction[_transactionByHash[txHash]].expires = expires;
+
+            _transaction[_transactionByHash[txHash]].targets = targets;
+            _transaction[_transactionByHash[txHash]].values = values;
+            _transaction[_transactionByHash[txHash]].calldatas = calldatas;
+
             _transaction[_transactionByHash[txHash]].status = Status.PENDING;
 
         } // Else create a new tx 
@@ -299,8 +316,6 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
             // Create transaction
             Transaction memory transaction =  Transaction(
                 // #TODO: pass these params from forwarder 
-                gasPrice;
-                GAS_TOKEN;
                 purpose
                 submitted,
                 expires,
@@ -311,22 +326,21 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
             );
 
             // Push to transaction array
-            _push(transaction);
+            _transactions.push(transaction);
 
             // Transactions by hash
-            _transactionByHash[txHash] = _length;
+            _transactionByHash[txHash] = _transactions.length;
         }
 
+        // If the user has the approvals allow them to approve?
+
         // Add the approval from the sender
-        _approvalsByTransaction[_length][_msgSender()] = true;   
+        _approvalsByTransaction[_transactions.length][_msgSender()] = true;   
 
         // Call execute on the tx
         execute(targets, values, calldatas);
 
-        // Refund 
-        
-
-        return _length;
+        return _transactions.length;
     }
 
     // Approve a transaction with controlling key, intended as multi-factor auth rather than dedicated multisig.  
@@ -339,16 +353,16 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         keyHasRequiredPurpose(_msgSender(), _transactionByHash[txHash].targets, _transactionByHash[txHash].values, _transactionByHash[txHash].calldatas)
         hasNotApproved(txHash, _msgSender())
         notExecuted(txHash)
-        // returns (uint256)
+        returns (uint256)
     {
         // Set approved
         _approvalsByTransaction[_transactionByHash[txHash]][_msgSender()] = approved;   
 
+        // Event
+        emit Approved(_msgSender(), _txHash, approved);
+
         // Call execute on the tx
-        execute(_targets, _values, _calldatas);
-
-        // Refund 
-
+        return execute(_targets, _values, _calldatas);
     }
 
     // Allows an key to revoke a approval for a 
@@ -360,8 +374,11 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         hasApproved(txHash, _msgSender())
         notExecuted(txHash)
     {
+        // Revoke approval
         _approvalsByTransaction[_transactionByHash[txHash]][_msgSender()] = false;
-        Revocation(_msgSender(), txHash);
+
+        // Event 
+        emit Revocation(_msgSender(), txHash);
     }
 
     // Execute the transaction if can be executed
@@ -376,7 +393,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         keyExists(_msgSender())
         hasApproved(getTransactionHash(targets, values, calldatas), _msgSender())
         notExecuted(getTransactionHash(targets, values, calldatas))
-        returns (uint256)
+        returns (bool)
     {
         // Get the by hash
         uint256 txHash = hashTransaction(targets, values, calldatas);
@@ -389,14 +406,11 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
             // Require tx in appropriate state to be executed
             require(_transaction[_transactionByHash[txHash]].status == Status.PENDING, "Hyperbase: can only execute");
                 
-            // Executed the TX
+            // Execute the TX
             _execute(txHash, targets, values, calldatas);
 
-            // #TODO: if can execute tx then status suceeded, otherwise failed
-            
-            
             // Update the transaction status
-            _transaction[_transactionByHash[txHash]].status = Status.SUCEEDED;
+            _transaction[_transactionByHash[txHash]].status = Status.EXECUTED;
 
             // Event
             emit TransactionExecuted(txHash);
@@ -413,7 +427,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         bytes[] memory calldatas
     )
         internal
-        virtual
+        returns
     {
         string memory errorMessage = "Hyperbase: call reverted without message";
         for (uint256 i = 0; i < targets.length; ++i) {
@@ -439,7 +453,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         Status status = _transaction[_transactionByHash[txHash]].status;
 
         // Require transaction is in viable state
-        require(status != Status.CANCELLED && status != Status.EXPIRED && status != Status.SUCEEDED, "Hyperbase: transaction not active");
+        require(status != Status.CANCELLED && status != Status.EXPIRED && status != Status.EXECUTED, "Hyperbase: transaction not active");
 
         // Update the transaction status
         _transaction[_transactionByHash[txHash]].status = Status.CANCELLED;
@@ -450,7 +464,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         return _transactionByHash[txHash];
     }
 
-    // Internal function, handles refunding metatx to the relay in erc20 protocol token
+    // Internal function, handles refunding tx to the relay in erc20 protocol token
     function refundRelay(
         uint256 gasPrice,
         uint256 startGas
@@ -532,37 +546,61 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         return _keys;
     }
     
-    function getKey(bytes32 _key)
+    // Return key details
+    function getKey(
+        address _key
+    )
         public
         view
-        returns(uint256 purpose, uint256 keyType, bytes32 key)
+        returns(uint256, Purpose, bool)
     {
-        return (keys[_key].purpose, keys[_key].keyType, keys[_key].key);
+        return (_keys.key, _keys.purpose, _keys.exists);
     }
 
-    function getKeyPurpose(bytes32 _key)
+
+    function getKeyPurpose(
+        address _key
+    )
         public
         view
-        returns(uint256 purpose)
+        returns(Purpose)
     {
         return (keys[_key].purpose);
     }
 
-    function getKeysByPurpose(uint256 _purpose)
+    function getKeysByPurpose(
+        uint256 _purpose
+    )
         public
         view
         returns(bytes32[] _keys)
     {
-        return keysByPurpose[_purpose];
+        return _keysByPurpose[_purpose];
     }
 
+    // 
+    function getRequiredPermissions(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas
+    )
+        public
+        view
+        returns(bytes32[] _keys)
+    {
+        
+    }
 
     // The transaction hash is is produced by hashing the `targets` array, the `values` array and the `calldatas` array.
     function getTransactionHash(
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas
-    ) public pure virtual override returns (uint256) {
+    )
+        public
+        pure 
+        override returns (uint256)
+    {
         return uint256(keccak256(abi.encode(targets, values, calldatas)));
     }
 
