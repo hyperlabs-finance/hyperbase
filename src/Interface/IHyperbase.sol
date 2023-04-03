@@ -3,14 +3,14 @@
 pragma solidity ^0.8.6;
 
 interface IHyperbase {
-	
+    
     event KeyAdded(bytes32 indexed key, uint256 indexed purpose, uint256 indexed keyType);
     event KeyRemoved(bytes32 indexed key, uint256 indexed purpose, uint256 indexed keyType);
     event ExecutionRequested(uint256 indexed executionId, address indexed to, uint256 indexed value, bytes data);
     event Executed(uint256 indexed executionId, address indexed to, uint256 indexed value, bytes data);
     event Approved(uint256 indexed executionId, bool approved);
+    event ExecutedSigned(bytes32 signHash, uint nonce, bool success);
 
-    
     event Confirmation(address indexed sender, uint indexed transactionId);
     event Revocation(address indexed sender, uint indexed transactionId);
     event Submission(uint indexed transactionId);

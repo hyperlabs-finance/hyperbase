@@ -24,30 +24,21 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     ////////////////
 
     // Maximum keys
+    address GAS_TOKEN;
+
+    // Maximum keys
     uint8 MAX_KEY_COUNT;
 
     // Expiry period in block time
     uint256 EXPIRY_PERIOD;
 
-  	////////////////
-    // STATE
-    ////////////////
-
-    struct Key {
-        bytes32 key;
-        uint256 purpose; //e.g., MANAGEMENT_KEY = 1, ACTION_KEY = 2, etc.
-        bool exists;
+    // Determines what types of tx the key can submit/approve 
+    enum Purpose {
+        MANAGEMENT;
+        ACTION;
+        CLAIM;
     }
-
-	// All keys on the acapprovalCount
-    Key[] public _keys;
-
-	// Mapping from address to is key bool y/n
-    mapping(address => bool) public _isKey;
-
-	// Signatures required to execute tx
-	uint8 _required = 1;
-
+    
     // Execution status
     enum Status {
         PENDING,
@@ -57,31 +48,41 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         FAILED
     }
 
+  	////////////////
+    // STATE
+    ////////////////
+
+    struct Key {
+        address key;
+        Purpose purpose;
+        bool exists;
+    }
+
+	// All keys on the acapprovalCount
+    Key[] public _keys;
+
+    // Mapping from purpose const to 
+    mapping(Purpose => uint256) _requiredByPurpose;
+
     // Core transaction details
     struct Transaction {
+        Purpose required;
+        Timers.BlockNumber submitted;
+        Timers.BlockNumber expires;
         address[] targets;
         uint256[] values;
         bytes[] calldatas;
-    }
-
-    // Meta Transaction details
-    struct Meta {
-        address gasToken;
-        uint256 gasPrice;
-        Timers.BlockNumber submitted;
-        Timers.BlockNumber expires;
-        Transaction transaction;
         Status executed;
     }
 
-	// All _metaTx from 
-	Meta[] private _metaTx;
+	// All _transaction from 
+	Transaction[] private _transaction;
 
-	// Mapping from metaTransaction index to adress to approval status
-    mapping(uint256 => mapping(address => bool)) public _approvalsByMetaTx;
+	// Mapping from transaction index to adress to approval status
+    mapping(uint256 => mapping(address => bool)) public _approvalsByTransaction;
 
-    // Mapping from id to _metaTx index
-    mapping(uint256 => uint256) _metaTxByHash;
+    // Mapping from id to _transaction index
+    mapping(uint256 => uint256) _transactionByHash;
 
   	////////////////
     // CONSTRUCTOR
@@ -92,9 +93,20 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 	)
 		ERC2771Context(forwarder)
 	{
-		_keys[_msgSender()].key = _msgSender();
-		_keys[_msgSender()].exists = true;
-		_keys[_msgSender()].purpose = 1;
+        // Create key
+        Key memory key =  Key(
+            _msgSender(),
+            true,
+            Purpose.MANAGEMENT
+        );
+
+        // Push to transaction array
+        _keys.push(key);
+        
+        // Update requirements for all op types
+        for (uint16 i = 0; i < _requirementsByKeyType.length; i++) {
+            _requiredByPurpose[Purpose(i)] = 1;
+        }
 	}
 
   	////////////////
@@ -123,7 +135,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     modifier transactionExists(
 		uint256 txHash
 	) {
-        require(_metaTx[_metaTxByHash[txHash]].destination != 0);
+        require(_transaction[_transactionByHash[txHash]].destination != 0);
         _;
     }
 
@@ -131,7 +143,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 		uint256 txHash,
 		address key
 	) {
-        require(_approvalsByMetaTx[_metaTxByHash[txHash]][key]);
+        require(_approvalsByTransaction[_transactionByHash[txHash]][key]);
         _;
     }
 
@@ -139,14 +151,14 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 		uint256 txHash,
 		address key
 	) {
-        require(!_approvalsByMetaTx[_metaTxByHash[txHash]][key]);
+        require(!_approvalsByTransaction[_transactionByHash[txHash]][key]);
         _;
     }
 
     modifier notExecuted(
 		uint256 txHash
 	) {
-        require(!_metaTx[_metaTxByHash[txHash]].status);
+        require(!_transaction[_transactionByHash[txHash]].status);
         _;
     }
 
@@ -176,7 +188,8 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 
     // Allows to add a new key. Transaction has to be sent by This.
     function addKey(
-		address key
+		address addr,
+        Purpose purpose 
 	)
         public
         onlyThis
@@ -184,8 +197,16 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         notNull(key)
         validRequirement(_keys.length + 1, _required)
     {
-        _keys[key].exists = true;
+        // Create key
+        Key memory key =  Key(
+            addr,
+            true,
+            purpose
+        );
+
+        // Push to transaction array
         _keys.push(key);
+        
         emit KeyAdded(key);
     }
 
@@ -197,6 +218,10 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         onlyThis
         keyExists(key)
     {
+        // #TODO: refactor this
+
+        // Check that the key being removed does not result in the account being locked
+        
         _keys[key].exists = false;
         for (uint256 i=0; i<_keys.length - 1; i++)
             if (_keys[i] == key) {
@@ -219,18 +244,11 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         keyExists(key)
         keyDoesNotExist(newKey)
     {
-        // #TODO: refactor this
-        
-        for (uint256 i=0; i<_keys.length; i++)
-            if (_keys[i] == key) {
-                _keys[i] = newKey;
-                break;
-            }
-        _keys[key].exists = false;
-        emit KeyRemoved(key);
+        // Add key
+        addKey(newKey, _keys[key].purpose);
 
-        _isKey[newKey] = true;
-        emit KeyAdded(newKey);
+        // Remove key
+        removeKey(key);
     }
 
     //////////////////////////////////////////////
@@ -239,72 +257,76 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
 
     // Submit a transaction to execute on the account
     function submit(
+        address GAS_TOKEN,
+        uint256 gasPrice,
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas
     )
 		public
+        keyHasRequiredPurpose(_msgSender(), targets, values, calldatas)
 		returns (uint256)
 	{
         // Sanity checks
-        require(targets.length == values.length, "Hyperbase: invalid transaction length");
-        require(targets.length == calldatas.length, "Hyperbase: invalid transaction length");
         require(targets.length > 0, "Hyperbase: empty transaction");
+        require(targets.length == values.length == calldatas.length, "Hyperbase: invalid transaction length");
+
+        // #TODO: require the key has appropriate permission levels to submit the tx
 
         // Hash the tx
         uint256 txHash = getTransactionHash(targets, values, calldatas);
+
+        // #TODO: Determine the purpose by the op type
+        if (target == address(this)) 
+            Purpose purpose = Purpose.MANAGEMENT; // calling Self should be only be with MANAGEMENT_KEY
+        else if (target == address(_claimRegistry) && callDatas == /* #TODO add claim */)
 
         // Get the block times for now and transaction expiry
         uint64 submitted = block.number.toUint64();
         uint64 expires = submitted + getExpiryPeriod().toUint64();
 
         // If tx exsists then reset/update its fields
-        if (0 < _metaTxByHash[txHash]) {
-            // Sanity checks
-            // TODO: require these 
-            
-            _metaTx[_metaTxByHash[txHash]].submitted = submitted;
-            _metaTx[_metaTxByHash[txHash]].expires = expires;
-            // #TODO: pass these params from forwarder 
-            // _metaTx[_metaTxByHash[txHash]].gasPrice;
-            // _metaTx[_metaTxByHash[txHash]].gasToken;
-            _metaTx[_metaTxByHash[txHash]].submitted = Status.PENDING;
-        }
+        if (0 < _transactionByHash[txHash]) {
+            _transaction[_transactionByHash[txHash]].gasPrice;
+            _transaction[_transactionByHash[txHash]].GAS_TOKEN;
+            _transaction[_transactionByHash[txHash]].purpose = purpose;
+            _transaction[_transactionByHash[txHash]].submitted = submitted;
+            _transaction[_transactionByHash[txHash]].expires = expires;
+            _transaction[_transactionByHash[txHash]].status = Status.PENDING;
 
-        // Else create a new tx 
+        } // Else create a new tx 
         else {
             // Create transaction
             Transaction memory transaction =  Transaction(
+                // #TODO: pass these params from forwarder 
+                gasPrice;
+                GAS_TOKEN;
+                purpose
+                submitted,
+                expires,
                 targets,
                 values,
                 calldatas
-            );
-
-            // Meta transaction 
-            Meta memory metaTransaction =  Meta(
-                submitted,
-                expires,
-                // #TODO: pass these params from forwarder 
-                // gasPrice;
-                // gasToken;
-                transaction,
                 Status.PENDING
             );
 
             // Push to transaction array
-            _metaTx.push(metaTransaction);
+            _push(transaction);
 
             // Transactions by hash
-            _metaTxByHash[txHash] = _metaTx.length;
+            _transactionByHash[txHash] = _length;
         }
 
         // Add the approval from the sender
-        _approvalsByMetaTx[_metaTx.length][_msgSender()] = true;   
+        _approvalsByTransaction[_length][_msgSender()] = true;   
 
         // Call execute on the tx
         execute(targets, values, calldatas);
 
-        return _metaTx.length;
+        // Refund 
+        
+
+        return _length;
     }
 
     // Approve a transaction with controlling key, intended as multi-factor auth rather than dedicated multisig.  
@@ -314,18 +336,22 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     )
         public
         keyExists(_msgSender())
+        keyHasRequiredPurpose(_msgSender(), _transactionByHash[txHash].targets, _transactionByHash[txHash].values, _transactionByHash[txHash].calldatas)
         hasNotApproved(txHash, _msgSender())
         notExecuted(txHash)
-        returns (uint256)
+        // returns (uint256)
     {
         // Set approved
-        _approvalsByMetaTx[_metaTxByHash[txHash]][_msgSender()] = approved;   
+        _approvalsByTransaction[_transactionByHash[txHash]][_msgSender()] = approved;   
 
         // Call execute on the tx
-        execute(_metaTx.targets, _metaTx.values, _metaTx.calldatas);
+        execute(_targets, _values, _calldatas);
+
+        // Refund 
+
     }
 
-    // Allows an key to revoke a approval for a transaction.
+    // Allows an key to revoke a approval for a 
     function revokeApproval(
         uint256 txHash
     )
@@ -334,7 +360,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         hasApproved(txHash, _msgSender())
         notExecuted(txHash)
     {
-        _approvalsByMetaTx[_metaTxByHash[txHash]][_msgSender()] = false;
+        _approvalsByTransaction[_transactionByHash[txHash]][_msgSender()] = false;
         Revocation(_msgSender(), txHash);
     }
 
@@ -355,13 +381,13 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         // Get the by hash
         uint256 txHash = hashTransaction(targets, values, calldatas);
         
-        if (_required =< _approvalsByMetaTx[_metaTxByHash[txHash]]) {
+        if (_required =< _approvalsByTransaction[_transactionByHash[txHash]]) {
 
             // Get the by hash
             uint256 txHash = hashTransaction(targets, values, calldatas);
 
             // Require tx in appropriate state to be executed
-            require(_metaTx[_metaTxByHash[txHash]].status == Status.PENDING, "Hyperbase: can only execute");
+            require(_transaction[_transactionByHash[txHash]].status == Status.PENDING, "Hyperbase: can only execute");
                 
             // Executed the TX
             _execute(txHash, targets, values, calldatas);
@@ -370,7 +396,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
             
             
             // Update the transaction status
-            _metaTx[_metaTxByHash[txHash]].status = Status.SUCEEDED;
+            _transaction[_transactionByHash[txHash]].status = Status.SUCEEDED;
 
             // Event
             emit TransactionExecuted(txHash);
@@ -406,29 +432,28 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         virtual
         returns (uint256)
     {
-        // Get the by hash
+        // Get the hash
         uint256 txHash = hashTransaction(targets, values, calldatas);
 
         // Get tx status
-        Status status = _metaTx[_metaTxByHash[txHash]].status;
+        Status status = _transaction[_transactionByHash[txHash]].status;
 
         // Require transaction is in viable state
         require(status != Status.CANCELLED && status != Status.EXPIRED && status != Status.SUCEEDED, "Hyperbase: transaction not active");
 
         // Update the transaction status
-        _metaTx[_metaTxByHash[txHash]].status = Status.CANCELLED;
+        _transaction[_transactionByHash[txHash]].status = Status.CANCELLED;
 
         // Event
-        emit TransactionCanceled(_metaTxByHash[txHash]);
+        emit TransactionCanceled(_transactionByHash[txHash]);
 
-        return _metaTxByHash[txHash];
+        return _transactionByHash[txHash];
     }
 
     // Internal function, handles refunding metatx to the relay in erc20 protocol token
     function refundRelay(
         uint256 gasPrice,
-        uint256 startGas,
-        address gasToken
+        uint256 startGas
     )
         internal
     {
@@ -438,12 +463,12 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
             uint256 amount = (startGas - gasleft()) * gasPrice;
 
             // If not set gas token
-            if (gasToken == address(0)) 
+            if (GAS_TOKEN == address(0)) 
                 address(msg.sender).transfer(amount);
 
             // Else ERC20 refund
             else 
-                ERC20Token(gasToken).transfer(msg.sender, amount);
+                ERC20Token(GAS_TOKEN).transfer(msg.sender, amount);
         }
     }
 
@@ -459,7 +484,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     {
         uint256 approvals = 0;
         for (uint256 i = 0; i < _keys.length; i++) {
-            if (_approvalsByMetaTx[_txHash][_keys[i]])
+            if (_approvalsByTransaction[_txHash][_keys[i]])
                 approvals++;
         }
         if (required < approvals) return true;
@@ -476,7 +501,8 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         returns(bool result)
     {
         bool isThere;
-        if (_keys[key].key == 0) return false;
+        if (_keys[key].key == 0)
+            return false;
         isThere = _keys[key].purpose <= purpose;
         return isThere;
     }
@@ -540,7 +566,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         return uint256(keccak256(abi.encode(targets, values, calldatas)));
     }
 
-    // Returns number of `_approvalsByMetaTx` of a transaction.
+    // Returns number of `_approvalsByTransaction` of a 
     function getApprovalCount(
         uint256 txHash
     )
@@ -549,11 +575,11 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         returns (uint8 approvalCount)
     {
         for (uint256 i=0; i<_keys.length; i++)
-            if (_approvalsByMetaTx[_metaTxByHash[txHash]][_keys[i]])
+            if (_approvalsByTransaction[_transactionByHash[txHash]][_keys[i]])
                 approvalCount++;
     }
 
-    // Returns total number of `_metaTx` after filers are applied.
+    // Returns total number of `_transaction` after filers are applied.
     function getTransactionCount(
         bool pending,
         bool executed
@@ -562,31 +588,31 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         view
         returns (uint8 approvalCount)
     {
-        for (uint256 i=0; i< _metaTx.length; i++)
-            if (pending && !_metaTx[i].status || executed && _metaTx[i].status)
+        for (uint256 i=0; i< _length; i++)
+            if (pending && !_transaction[i].status || executed && _transaction[i].status)
                 approvalCount++;
     }
 
-    // Returns array with `_key` addresses that confirmed transaction.
+    // Returns array with `_key` addresses that confirmed 
     function getApprovals(
         uint256 txHash
     )
         public
         view
-        returns (address[] approvalsByMetaTx)
+        returns (address[] approvalsByTransaction)
     {
-        address[] memory _approvalsByMetaTxTemp = new address[](_keys.length);
+        address[] memory _approvalsByTransactionTemp = new address[](_keys.length);
         uint8 approvalCount = 0;
         uint256 i;
         for (i=0; i<_keys.length; i++) {
-            if (_approvalsByMetaTx[_metaTxByHash[txHash]][_keys[i]]) {
-                _approvalsByMetaTxTemp[approvalCount] = _keys[i];
+            if (_approvalsByTransaction[_transactionByHash[txHash]][_keys[i]]) {
+                _approvalsByTransactionTemp[approvalCount] = _keys[i];
                 approvalCount++;
             }
         }
-        approvalsByMetaTx = new address[](approvalCount);
+        approvalsByTransaction = new address[](approvalCount);
         for (i=0; i<approvalCount; i++)
-            approvalsByMetaTx[i] = _approvalsByMetaTxTemp[i];
+            approvalsByTransaction[i] = _approvalsByTransactionTemp[i];
     }
 
     // Returns list of transaction IDs in defined range.
@@ -600,11 +626,11 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
         view
         returns (uint256[] _txHashs)
     {
-        uint256[] memory txHashsTemp = new uint256[](_transaction.length);
+        uint256[] memory txHashsTemp = new uint256[](_length);
         uint8 approvalCount = 0;
         uint256 i;
-        for (i=0; i<_transaction.length; i++) {
-            if (pending && !_metaTx[i].status || executed && _metaTx[i].status) {
+        for (i=0; i<_length; i++) {
+            if (pending && !_transaction[i].status || executed && _transaction[i].status) {
                 txHashsTemp[approvalCount] = i;
                 approvalCount++;
             }
@@ -618,7 +644,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     // SETTERS
     //////////////////////////////////////////////
 
-    // Allows to change the number of _required _approvalsByMetaTx. Transaction has to be sent by This.
+    // Allows to change the number of _required _approvalsByTransaction. Transaction has to be sent by This.
     function setRequirement(
         uint8 required
     )
@@ -633,7 +659,7 @@ contract Hyperbase is IHyperbase, ERC2771Context, IERC20 {
     /////////////////////////////////// LATER
 
 	// #TODO: make fully cloneable
-    // Contract constructor sets initial _keys and _required number of _approvalsByMetaTx.
+    // Contract constructor sets initial _keys and _required number of _approvalsByTransaction.
     function initialize(
 		address[] keys,
 		uint8 _required
