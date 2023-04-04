@@ -3,14 +3,13 @@
 pragma solidity ^0.8.6;
 
 import '../Interface/IHyperbaseClaimRegistry.sol';
+import 'openzeppelin-contracts/contracts/access/ownable.sol';
 
-contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry {
+contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
 
   	////////////////
     // STATE
     ////////////////
-
-    // CLAIMS
 
     struct Claim {
         uint256 topic;
@@ -25,8 +24,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry {
     mapping(address => mapping(bytes32 => Claim)) internal _claimsByIdBySubject;
     mapping(address => mapping(uint256 => bytes32[])) internal _claimIdsByTopicsBySubject; 
     mapping(bytes => bool) public _revokedBySig;
-
-    // TRUSTED VERIFIERS
 
     // Array of all trusted _verifiers i.e. kyc agents, etc
     address[] public _verifiers;

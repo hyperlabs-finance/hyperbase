@@ -5,7 +5,7 @@ pragma solidity ^0.8.6;
 import 'openzeppelin-contracts/contracts/metatx/MinimalForwarder.sol';
 import 'openzeppelin-contracts/contracts/access/ownable.sol';
 
-contract HyperbaseForwarder is MinimalForwarder {
+contract HyperbaseForwarder is MinimalForwarder, Ownable {
 
   	////////////////
     // STATE
@@ -22,11 +22,11 @@ contract HyperbaseForwarder is MinimalForwarder {
     ////////////////
 		
 	constructor(
-		address protocolToken,
+		address paymentToken,
 		uint8 txFeePercentage
 	)
 	{
-		_protocolToken = protocolToken;
+		_paymentToken = paymentToken;
 		_txFeePercentage = txFeePercentage;
 	}
 
@@ -35,12 +35,12 @@ contract HyperbaseForwarder is MinimalForwarder {
     //////////////////////////////////////////////
 
 	function setProtocolToken(
-		address protocolToken
+		address paymentToken
 	)
 		public
 		onlyOwner
 	{
-		_protocolToken = protocolToken;
+		_paymentToken = paymentToken;
 	}
 
 	function setTxFeePercentage(
