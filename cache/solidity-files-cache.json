@@ -767,8 +767,8 @@
       }
     },
     "/mnt/c/Users/44783/Desktop/PROJECTS/hypersurface/hyperbase/src/Hyperbase/HyperbaseClaimRegistry.sol": {
-      "lastModificationDate": 1680542601625,
-      "contentHash": "94de387785e8419db947b14f385f80d1",
+      "lastModificationDate": 1681303527570,
+      "contentHash": "5c4f277dc7149d0de991bcdac8b095ad",
       "sourceName": "src/Hyperbase/HyperbaseClaimRegistry.sol",
       "solcConfig": {
         "settings": {
@@ -808,8 +808,8 @@
       }
     },
     "/mnt/c/Users/44783/Desktop/PROJECTS/hypersurface/hyperbase/src/Hyperbase/HyperbaseIdentityRegistry.sol": {
-      "lastModificationDate": 1680257603704,
-      "contentHash": "406c8b96777e20dc8129a975d3f8e459",
+      "lastModificationDate": 1681303250691,
+      "contentHash": "05124902111730d13d614f28a139b199",
       "sourceName": "src/Hyperbase/HyperbaseIdentityRegistry.sol",
       "solcConfig": {
         "settings": {
@@ -846,46 +846,9 @@
         }
       }
     },
-    "/mnt/c/Users/44783/Desktop/PROJECTS/hypersurface/hyperbase/src/Interface/IHyperbase.sol": {
-      "lastModificationDate": 1680600811591,
-      "contentHash": "828b9ec413aa154f05d700d457db6198",
-      "sourceName": "src/Interface/IHyperbase.sol",
-      "solcConfig": {
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "metadata": {
-            "bytecodeHash": "ipfs"
-          },
-          "outputSelection": {
-            "*": {
-              "": [
-                "ast"
-              ],
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ]
-            }
-          },
-          "evmVersion": "london"
-        }
-      },
-      "imports": [],
-      "versionRequirement": "^0.8.6",
-      "artifacts": {
-        "IHyperbase": {
-          "0.8.14+commit.80d49f37.Linux.gcc": "IHyperbase.sol/IHyperbase.json"
-        }
-      }
-    },
     "/mnt/c/Users/44783/Desktop/PROJECTS/hypersurface/hyperbase/src/Interface/IHyperbaseClaimRegistry.sol": {
-      "lastModificationDate": 1680360469340,
-      "contentHash": "87a3131f50f5c02c5bdd5e3060bd14d5",
+      "lastModificationDate": 1681303353481,
+      "contentHash": "232723d02a48da5ad92336643cc9bb0b",
       "sourceName": "src/Interface/IHyperbaseClaimRegistry.sol",
       "solcConfig": {
         "settings": {
@@ -921,8 +884,8 @@
       }
     },
     "/mnt/c/Users/44783/Desktop/PROJECTS/hypersurface/hyperbase/src/Interface/IHyperbaseIdentityRegistry.sol": {
-      "lastModificationDate": 1680092982325,
-      "contentHash": "f1d63fbd87f2cb53f6e888d987907ebd",
+      "lastModificationDate": 1681303254468,
+      "contentHash": "2655f363dd22b9db3025df559d0a1a04",
       "sourceName": "src/Interface/IHyperbaseIdentityRegistry.sol",
       "solcConfig": {
         "settings": {

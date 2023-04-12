@@ -5,7 +5,6 @@ In many ways, Blockchain today is like the first generation of the web. While th
 It is our conclusion that for blockchain-based applications to achieve mainstream commercial success, the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level, rather than a necessary pastime for anyone who wishes to participate.
 
 ## Barriers to Adoption
-
 Although the potential of blockchain technology is increasingly recognised across industries the typical approach to building applications has changed remarkably little. Even in 2023, blockchain applications make little provision for non-technical users. This design philosophy is best categorised as: “by developers, for developers”. 
 
 #### Application Design
@@ -39,7 +38,7 @@ Importantly, Hyperbase does so while maintaining the full benefits of decentrali
 
 #### Subdomain Identifiers 
 
-Users have come to expect accounts to be identified by names, usernames, handles, or email addresses, all of which provide identification in a simple, comprehensible format. Rather than being identified by a 42-character public key, Hyperbase accounts and objects are identified by subdomains, giving users a clear, comprehensible handle for interactions. Subdomains may be created using ENS with the ERC-137 4 or with the newer ERC-4843 5 . 
+Users have come to expect accounts to be identified by names, usernames, handles, or email addresses, all of which provide identification in a simple, comprehensible format. Rather than being identified by a 42-character public key, Hyperbase accounts and objects are identified by subdomains, giving users a clear, comprehensible handle for interactions. Subdomains may be created using ENS with the ERC-137 4 or with the newer ERC-4843. 
 
 #### Identity Accounts 
 

@@ -21,7 +21,7 @@ interface IHyperbaseClaimRegistry {
     event TrustedVerifierAdded(address indexed verifier, uint256[] claimTopics);
     
     // Topics that the verifier is trusted to attest to have been updated 
-    event TrustedClaimTopicsUpdated(address indexed verifier, trustedTopics);
+    event TrustedClaimTopicsUpdated(address indexed verifier, uint256[] trustedTopics);
     
     // A trusted verifier has been removed completely
     event TrustedVerifierRemoved(address indexed verifier);

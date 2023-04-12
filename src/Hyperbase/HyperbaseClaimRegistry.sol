@@ -113,7 +113,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         if (topic == 0)
             revert NonExistantClaim();
 
-        while (uint256 claimIndex = 0; _claimIdsByTopicsBySubject[subject][topic][claimIndex] != claimId)
+        uint256 claimIndex = 0; 
+        while (_claimIdsByTopicsBySubject[subject][topic][claimIndex] != claimId)
             claimIndex++;
         
 
@@ -230,13 +231,13 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         if (0 == _verifierTrustedTopics[verifier].length)
             revert NonExistantVerifier();
         if (0 < trustedTopics.length)
-            revert EmptyClaimsTopics();
+            revert EmptyClaimTopics();
 
         // Update
         _verifierTrustedTopics[verifier] = trustedTopics;
 
         // Event
-        emit ClaimTopicsUpdated(verifier, trustedTopics);
+        emit TrustedClaimTopicsUpdated(verifier, trustedTopics);
     }
     
     //////////////////////////////////////////////
@@ -334,6 +335,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         return checkIsClaimValid(_claimsByIdBySubject[subject][claimId].subject, _claimsByIdBySubject[subject][claimId].topic, _claimsByIdBySubject[subject][claimId].sig, _claimsByIdBySubject[subject][claimId].data);
     }
 
+    // #TODO: this is basically redundant? Or is broken
     // Checks if a claim is valid.
     function checkIsClaimValid(
         address subject,
