@@ -3,10 +3,9 @@
 pragma solidity ^0.8.6;
 
 import '../Interface/IHyperbaseClaimRegistry.sol';
-import 'openzeppelin-contracts/contracts/access/ownable.sol';
 import 'openzeppelin-contracts/contracts/metatx/ERC2771Context.sol';
 
-contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Ownable {
+contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
 
   	////////////////
     // STATE
@@ -43,6 +42,18 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
 
     // Mapping between a trusted verifier address and the corresponding topics it's trusted to verify i.e. Accredited, HNWI, etc.
     mapping(address => uint256[]) public _verifierTrustedTopics;
+
+  	////////////////
+    // CONSTRUCTOR
+    ////////////////
+		
+	constructor(
+		address forwarder
+	)
+		ERC2771Context(forwarder) 
+	{
+        _transferOwnership(_msgSender());
+    }
 
   	////////////////
     // MODIFIERS
@@ -92,7 +103,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
         claimId = _claims.length;
         
         _claimValidity[claimId] = true;
-        _claims = claimId;
         _claimsBySubject[subject].push(claimId);
         _claimsByTopicBySubject[subject][topic].push(claimId);
         _claimsByIssuer[issuer].push(claimId);
@@ -242,7 +252,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
     {
         return _claimsBySubject[subject];
     }
-
+    
     // 
     function getClaimsSubjectTopic(
         address subject,
@@ -250,9 +260,9 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
     )
         public 
         view
-        returns(uint256)
+        returns(uint256[] memory)
     {
-        return _claims[];
+        return _claimsByTopicBySubject[subject][topic];
     }
 
     // 
@@ -273,9 +283,9 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
     )
         public 
         view
-        returns(uint256)
+        returns(uint256[] memory)
     {
-        return _claimsByIssuer[issuer][topic];
+        return _claimsByTopicByIssuer[issuer][topic];
     }
     
     // Return all the fields for a claim by the subject address and the claim id 
@@ -361,4 +371,56 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
         return _claimValidity[claim];
     }
 
+    //////////////////////////////////////////////
+    // OWNABLE
+    //////////////////////////////////////////////
+
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
 }

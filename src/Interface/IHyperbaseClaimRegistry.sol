@@ -73,7 +73,7 @@ interface IHyperbaseClaimRegistry {
     //////////////////////////////////////////////
 
     // Add a trusted verifier
-    function addTrustedVerifier(address verifier, uint256[] calldata trustedTopics) external;
+    function addTrustedVerifier(address verifier, uint256[] calldata trustedTopics) external returns (uint256);
 
     // Remove a trusted verifier 
     function removeTrustedVerifier(address verifier) external;
@@ -86,16 +86,16 @@ interface IHyperbaseClaimRegistry {
     //////////////////////////////////////////////
 
     // Returns the ids of claims associated with subject address
-    function getClaimsBySubject(address subject) external view returns(uint256);
+    function getClaimsBySubject(address subject) external view returns(uint256[] memory);
 
     // Returns the claims for the subject by given topic 
-    function getClaimsSubjectTopic(address subject, uint256 topic) external view returns(uint256);
+    function getClaimsSubjectTopic(address subject, uint256 topic) external view returns(uint256[] memory);
 
     // Returns the ids of claims issued by issuer address
-    function getClaimsByIssuer(address issuer) external view returns(uint256);
+    function getClaimsByIssuer(address issuer) external view returns(uint256[] memory);
 
     // Returns the claims issued by given topic 
-    function getClaimsIssuerTopic(address issuer, uint256 topic) external view returns(uint256);
+    function getClaimsIssuerTopic(address issuer, uint256 topic) external view returns(uint256[] memory);
     
     // Return all the fields for a claim by the subject address and the claim id (hash of topic and issuer)
     function getClaim(uint256 claim) external view returns (uint256, uint256, address, string memory); 
