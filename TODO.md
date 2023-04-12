@@ -1,5 +1,5 @@
-1. Restructure claims so as to be machine signable. Also, merge Verifiers and Registry
+Restructure claims so as to be machine signable. Also, merge Verifiers and Registry
 
-2. Errors
+Errors
 
-3. Subdomains for Hyperbase accounts (/ identities?)
+Subdomains for Hyperbase accounts (/ identities?)

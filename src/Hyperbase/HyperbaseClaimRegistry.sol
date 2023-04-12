@@ -19,10 +19,15 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         bytes sig;
         bytes data;
         string uri;
-    }
+    }       
 
+    // Mapping from subject address to claim id to claim
     mapping(address => mapping(bytes32 => Claim)) internal _claimsByIdBySubject;
+    
+    // Mapping from subject address to topic to claim ids
     mapping(address => mapping(uint256 => bytes32[])) internal _claimIdsByTopicsBySubject; 
+
+    // Mapping from signature claim id to revoked bool
     mapping(bytes => bool) public _revokedBySig;
 
     // Array of all trusted _verifiers i.e. kyc agents, etc
@@ -35,6 +40,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
     // ADD | REMOVE | REVOKE CLAIMS
     ////////////////////////////////////////////////////////////////
 
+    // Add a signed attestation
     function addClaim(
         uint256 topic,
         uint256 scheme,
@@ -45,7 +51,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         string memory uri
     )
         public
-        override
         returns (bytes32 claimRequestId)
     {
         bytes32 claimId = keccak256(abi.encode(issuer, topic));
@@ -60,6 +65,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
             _claimsByIdBySubject[subject][claimId].data = data;
             _claimsByIdBySubject[subject][claimId].uri = uri;
 
+            // Event
             emit ClaimAdded(
                 claimId,
                 topic,
@@ -79,6 +85,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
             _claimsByIdBySubject[subject][claimId].data = data;
             _claimsByIdBySubject[subject][claimId].uri = uri;
 
+            // Event
             emit ClaimChanged(
                 claimId,
                 topic,
@@ -94,25 +101,26 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         return claimId;
     }
 
+    // Remove a signed attestation 
     function removeClaim(
         bytes32 claimId,
 		address subject
     )
         public
-        override
         returns (bool success)
     {
         uint256 topic = _claimsByIdBySubject[subject][claimId].topic;
-        require(topic != 0, "NonExisting: There is no claim with this ID");
+        if (topic == 0)
+            revert NonExistantClaim();
 
-        uint claimIndex = 0;
-        while (_claimIdsByTopicsBySubject[subject][topic][claimIndex] != claimId) {
+        while (uint256 claimIndex = 0; _claimIdsByTopicsBySubject[subject][topic][claimIndex] != claimId)
             claimIndex++;
-        }
+        
 
         _claimIdsByTopicsBySubject[subject][topic][claimIndex] = _claimIdsByTopicsBySubject[subject][topic][_claimIdsByTopicsBySubject[subject][topic].length - 1];
         _claimIdsByTopicsBySubject[subject][topic].pop();
 
+        // Events
         emit ClaimRemoved(
             claimId,
             _claimsByIdBySubject[subject][claimId].topic,
@@ -148,6 +156,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         (topic, scheme, issuer, sig, data, uri) = getClaim(claimId, subject);
 
         _revokedBySig[sig] = true;
+
         return true;
     }
     
@@ -165,8 +174,10 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         onlyOwner
     {
         // Sanity checks
-        require(_verifierTrustedTopics[verifier].length == 0, "Trusted Verifier already exists");
-        require(trustedTopics.length > 0, "Trusted claim topics cannot be empty");
+        if (0 != _verifierTrustedTopics[verifier].length )
+            revert VerifierAlreadyExists();
+        if (0 == trustedTopics.length)
+            revert EmptyClaimTopics();
 
         // Add verifier
         _verifiers.push(verifier);
@@ -187,16 +198,17 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         onlyOwner
     {
         // Sanity checks
-        require(_verifierTrustedTopics[verifier].length != 0, "Verifier doesn't exist");
+        if (_verifierTrustedTopics[verifier].length == 0)
+            revert NonExistantVerifier();
 
         // Iterate through and remove
-        for (uint256 i = 0; i < _verifiers.length; i++) {
+        for (uint256 i = 0; i < _verifiers.length; i++)
             if (_verifiers[i] == verifier) {
                 _verifiers[i] = _verifiers[_verifiers.length - 1];
                 _verifiers.pop();
                 break;
             }
-        }
+        
 
         // Delete from 
         delete _verifierTrustedTopics[verifier];
@@ -215,8 +227,10 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         onlyOwner
     {
         // Sanity checks
-        require(_verifierTrustedTopics[verifier].length != 0, "Verifier doesn't exist");
-        require(trustedTopics.length > 0, "Claims topics cannot be empty");
+        if (0 == _verifierTrustedTopics[verifier].length)
+            revert NonExistantVerifier();
+        if (0 < trustedTopics.length)
+            revert EmptyClaimsTopics();
 
         // Update
         _verifierTrustedTopics[verifier] = trustedTopics;
@@ -225,10 +239,11 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         emit ClaimTopicsUpdated(verifier, trustedTopics);
     }
     
-    ////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////
     // GETTERS
-    ////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////
     
+    // Return all the fields for a claim by the subject address and the claim id (hash of topic and issuer)
     function getClaim(
         bytes32 claimId,
 		address subject
@@ -255,6 +270,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         );
     }
 
+    // Returns the claims of a given topic by subject address and topic 
     function getClaimIdsByTopic(
 		address subject,
         uint256 topic
@@ -267,6 +283,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         return _claimIdsByTopicsBySubject[subject][topic];
     }
 
+    // #TODO: refactor for ERC-2771?
     // Get address from sig
     function getRecoveredAddress(
         bytes memory sig,
@@ -282,9 +299,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         uint8 va;
 
         // Check the sig length
-        if (sig.length != 65) {
+        if (sig.length != 65)
             return address(0);
-        }
 
         // Divide the sig in r, s and v variables
         assembly {
@@ -293,9 +309,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
             va := byte(0, mload(add(sig, 96)))
         }
 
-        if (va < 27) {
+        if (va < 27)
             va += 27;
-        }
 
         address recoveredAddress = ecrecover(dataHash, va, ra, sa);
 
@@ -308,7 +323,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
 
     // Checks if claim is valid by id.
     function checkIsClaimValidById(
-        address subject,
+        address subject,    
         bytes32 claimId
     )
         public
@@ -343,9 +358,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         bytes32 hashedAddr = keccak256(abi.encode(recovered));
 
         // Does the trusted identifier have they key which signed the user's claim?
-        if (checkIsClaimRevoked(sig) == false) {
+        if (checkIsClaimRevoked(sig) == false)
             return true;
-        }
 
         return false;
     }
@@ -359,9 +373,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         view
         returns (bool)
     {
-        if (_revokedBySig[_sig]) {
+        if (_revokedBySig[_sig])
             return true;
-        }
 
         return false;
     }
@@ -375,11 +388,11 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         override
         returns (bool)
     {
-        for (uint256 i = 0; i < _verifiers.length; i++) {
+        for (uint256 i = 0; i < _verifiers.length; i++)
             if (_verifiers[i] == verifier) {
                 return true;
             }
-        }
+        
         return false;
     }
 
@@ -394,11 +407,11 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         returns (bool)
     {
         // Iterate through checking for claim topic
-        for (uint256 i = 0; i < _verifierTrustedTopics[verifier].length; i++) {
+        for (uint256 i = 0; i < _verifierTrustedTopics[verifier].length; i++)
             if (_verifierTrustedTopics[verifier][i] == topic) {
                 return true;
             }
-        }
+
         return false;
     }
 
