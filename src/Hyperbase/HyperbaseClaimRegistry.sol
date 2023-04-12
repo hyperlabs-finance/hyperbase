@@ -25,9 +25,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
 
     // Mapping from claim id to claim validity
     mapping(uint256 => bool) _claimValidity;
-
-    // Mapping from subject address to claim id
-    mapping(bytes32 => uint256) _claimByHash;
     
     // Mapping from address of subject to all claims to claim ids
     mapping(address => uint256[]) _claimsBySubject;
@@ -95,7 +92,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
         claimId = _claims.length;
         
         _claimValidity[claimId] = true;
-        _claimByHash[keccak256(abi.encode(issuer, topic))] = claimId;
         _claims = claimId;
         _claimsBySubject[subject].push(claimId);
         _claimsByTopicBySubject[subject][topic].push(claimId);
@@ -104,16 +100,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
 
         // Event
         emit ClaimAdded(claimId, topic, scheme, issuer, subject, uri);
-    }
-
-    // Remove a claim 
-    function revokeClaimByHash(
-        bytes32 claimHash
-    )
-        public
-        returns (bool success)
-    {
-        return revokeClaim(_claimByHash[claimHash]);
     }
 
     // Revoke a claim previously issued, the claim is no longer considered as valid after revocation.
@@ -129,16 +115,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
         return true;
     }
 
-    // Remove a claim 
-    function removeClaimByHash(
-        bytes32 claimHash
-    )
-        public
-        returns (bool success)
-    {
-        return removeClaim(_claimByHash[claimHash]);
-    }
-
     // Remove a signed attestation 
     function removeClaim(
         uint256 claim
@@ -152,7 +128,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
             revert NonExistantClaim();
 
         delete _claimValidity[claim];
-        delete _claimByHash[keccak256(abi.encode(_claims[claim].issuer, _claims[claim].topic))];
 
         delete _claimsBySubject[_claims[claim].subject];
         delete _claimsByTopicBySubject[_claims[claim].subject][_claims[claim].topic];
@@ -258,17 +233,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
     //////////////////////////////////////////////
     
     // 
-    function getClaimByHash(
-        bytes32 hash
-    )
-        public 
-        view
-        returns(uint256)
-    {
-        return _claimByHash[hash];
-    }
-
-    // 
     function getClaimsBySubject(
         address subject
     )
@@ -314,7 +278,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
         return _claimsByIssuer[issuer][topic];
     }
     
-    // Return all the fields for a claim by the subject address and the claim id (hash of topic and issuer)
+    // Return all the fields for a claim by the subject address and the claim id 
     function getClaim(
         uint256 claim
     )
@@ -369,17 +333,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Owna
                 return true;
 
         return false;
-    }
-
-    // Checks if claim is valid by id.
-    function checkIsClaimValidByHash(
-        bytes32 hash
-    )
-        public
-        view
-        returns (bool claimValid)
-    {
-        return checkIsClaimValid(_claimByHash[hash]);
     }
 
     // Checks if a claim is valid.

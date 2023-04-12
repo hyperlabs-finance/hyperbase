@@ -62,14 +62,8 @@ interface IHyperbaseClaimRegistry {
     // Add a claim that a subject account has a given attribute 
     function addClaim(uint256 topic, uint256 scheme, address subject, string memory uri) external returns (uint256 claimId);
 
-    // Revoke a claim by hash 
-    function revokeClaimByHash(bytes32 claimHash) external returns (bool success);
-
     // Revoking a claim keeping a recorded history of its existence but (most-likely) invalivating it for current interactions 
     function revokeClaim(uint256 claim) external returns(bool);
-
-    // Remove a claim by hash
-    function removeClaimByHash(bytes32 claimHash) external returns (bool success);
 
     // Completely remove a claim 
     function removeClaim(uint256 claim) external returns (bool success);
@@ -90,9 +84,6 @@ interface IHyperbaseClaimRegistry {
     //////////////////////////////////////////////
     // GETTERS
     //////////////////////////////////////////////
-    
-    // Returns a claim id by claim has (hash of topic and issuer) and the subject
-    function getClaimByHash(bytes32 hash) external view returns(uint256);
 
     // Returns the ids of claims associated with subject address
     function getClaimsBySubject(address subject) external view returns(uint256);
@@ -107,14 +98,11 @@ interface IHyperbaseClaimRegistry {
     function getClaimsIssuerTopic(address issuer, uint256 topic) external view returns(uint256);
     
     // Return all the fields for a claim by the subject address and the claim id (hash of topic and issuer)
-    function getClaim(uint256 claim) external view returns ( uint256, uint256, address, string memory ); 
+    function getClaim(uint256 claim) external view returns (uint256, uint256, address, string memory); 
 
     //////////////////////////////////////////////
     // CHECKS
     //////////////////////////////////////////////
-
-    // Checks if claim is valid by id.
-    function checkIsClaimValidByHash(bytes32 hash) external view returns (bool claimValid);
 
     // Checks if a claim is valid.
     function checkIsClaimValid(uint256 claim) external view returns (bool claimValid);
