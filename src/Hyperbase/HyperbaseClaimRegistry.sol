@@ -4,8 +4,9 @@ pragma solidity ^0.8.6;
 
 import '../Interface/IHyperbaseClaimRegistry.sol';
 import 'openzeppelin-contracts/contracts/access/ownable.sol';
+import 'openzeppelin-contracts/contracts/metatx/ERC2771Context.sol';
 
-contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
+contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context, Ownable {
 
   	////////////////
     // STATE
@@ -16,19 +17,29 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         uint256 scheme;
         address issuer;
 		address subject;
-        bytes sig;
-        bytes data;
         string uri;
-    }       
+    }
 
-    // Mapping from subject address to claim id to claim
-    mapping(address => mapping(bytes32 => Claim)) internal _claimsByIdBySubject;
+    // Array of all claims
+    Claim[] _claims;
+
+    // Mapping from claim id to claim validity
+    mapping(uint256 => bool) _claimValidity;
+
+    // Mapping from subject address to claim id
+    mapping(bytes32 => uint256) _claimByHash;
+    
+    // Mapping from address of subject to all claims to claim ids
+    mapping(address => uint256[]) _claimsBySubject;
     
     // Mapping from subject address to topic to claim ids
-    mapping(address => mapping(uint256 => bytes32[])) internal _claimIdsByTopicsBySubject; 
+    mapping(address => mapping(uint256 => uint256[])) _claimsByTopicBySubject; 
 
-    // Mapping from signature claim id to revoked bool
-    mapping(bytes => bool) public _revokedBySig;
+    // Mapping from issuer 
+    mapping(address => uint256[]) _claimsByIssuer;
+    
+    // Mapping from subject address to topic to claim ids
+    mapping(address => mapping(uint256 => uint256[])) _claimsByTopicByIssuer; 
 
     // Array of all trusted _verifiers i.e. kyc agents, etc
     address[] public _verifiers;
@@ -36,127 +47,129 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
     // Mapping between a trusted verifier address and the corresponding topics it's trusted to verify i.e. Accredited, HNWI, etc.
     mapping(address => uint256[]) public _verifierTrustedTopics;
 
-    ////////////////////////////////////////////////////////////////
+  	////////////////
+    // MODIFIERS
+    ////////////////
+
+    // Require caller is claim isser 
+    modifier onlyIssuer(uint256 claim) {
+        if (_msgSender() != _claims[claim].issuer)
+            revert NotIssuer();
+        _;
+    }
+
+    // Require caller is claim isser or claim subject
+    modifier onlyIssuerOrSubject(uint256 claim) {
+        if (_msgSender() != _claims[claim].issuer || _msgSender() != _claims[claim].subject)
+            revert NotIssuerOrSubject();
+        _;
+    }
+
+    //////////////////////////////////////////////
     // ADD | REMOVE | REVOKE CLAIMS
-    ////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////
 
     // Add a signed attestation
     function addClaim(
         uint256 topic,
         uint256 scheme,
-        address issuer,
-		address subject,
-        bytes memory sig,
-        bytes memory data,
+	    address subject,
         string memory uri
     )
         public
-        returns (bytes32 claimRequestId)
+        returns (uint256 claimId)
     {
-        bytes32 claimId = keccak256(abi.encode(issuer, topic));
+        address issuer = _msgSender();
 
-        if (_claimsByIdBySubject[subject][claimId].issuer != issuer) {
-            _claimIdsByTopicsBySubject[subject][topic].push(claimId);
-            _claimsByIdBySubject[subject][claimId].topic = topic;
-            _claimsByIdBySubject[subject][claimId].scheme = scheme;
-            _claimsByIdBySubject[subject][claimId].issuer = issuer;
-            _claimsByIdBySubject[subject][claimId].subject = subject;
-            _claimsByIdBySubject[subject][claimId].sig = sig;
-            _claimsByIdBySubject[subject][claimId].data = data;
-            _claimsByIdBySubject[subject][claimId].uri = uri;
+        Claim memory claim = Claim(
+            topic,
+            scheme,
+            issuer,
+            subject,
+            uri
+        );
 
-            // Event
-            emit ClaimAdded(
-                claimId,
-                topic,
-                scheme,
-                issuer,
-                subject,
-                sig,
-                data,
-                uri
-            );
-        } else {
-            _claimsByIdBySubject[subject][claimId].topic = topic;
-            _claimsByIdBySubject[subject][claimId].scheme = scheme;
-            _claimsByIdBySubject[subject][claimId].issuer = issuer;
-            _claimsByIdBySubject[subject][claimId].subject = subject;
-            _claimsByIdBySubject[subject][claimId].sig = sig;
-            _claimsByIdBySubject[subject][claimId].data = data;
-            _claimsByIdBySubject[subject][claimId].uri = uri;
+        // Push to claims array
+        _claims.push(claim);
+    
+        claimId = _claims.length;
+        
+        _claimValidity[claimId] = true;
+        _claimByHash[keccak256(abi.encode(issuer, topic))] = claimId;
+        _claims = claimId;
+        _claimsBySubject[subject].push(claimId);
+        _claimsByTopicBySubject[subject][topic].push(claimId);
+        _claimsByIssuer[issuer].push(claimId);
+        _claimsByTopicByIssuer[issuer][topic].push(claimId);
 
-            // Event
-            emit ClaimChanged(
-                claimId,
-                topic,
-                scheme,
-                issuer,
-                subject,
-                sig,
-                data,
-                uri
-            );
-        }
-
-        return claimId;
+        // Event
+        emit ClaimAdded(claimId, topic, scheme, issuer, subject, uri);
     }
 
-    // Remove a signed attestation 
-    function removeClaim(
-        bytes32 claimId,
-		address subject
+    // Remove a claim 
+    function revokeClaimByHash(
+        bytes32 claimHash
     )
         public
         returns (bool success)
     {
-        uint256 topic = _claimsByIdBySubject[subject][claimId].topic;
-        if (topic == 0)
-            revert NonExistantClaim();
-
-        uint256 claimIndex = 0; 
-        while (_claimIdsByTopicsBySubject[subject][topic][claimIndex] != claimId)
-            claimIndex++;
-        
-
-        _claimIdsByTopicsBySubject[subject][topic][claimIndex] = _claimIdsByTopicsBySubject[subject][topic][_claimIdsByTopicsBySubject[subject][topic].length - 1];
-        _claimIdsByTopicsBySubject[subject][topic].pop();
-
-        // Events
-        emit ClaimRemoved(
-            claimId,
-            _claimsByIdBySubject[subject][claimId].topic,
-            _claimsByIdBySubject[subject][claimId].scheme,
-            _claimsByIdBySubject[subject][claimId].issuer,
-            _claimsByIdBySubject[subject][claimId].subject,
-            _claimsByIdBySubject[subject][claimId].sig,
-            _claimsByIdBySubject[subject][claimId].data,
-            _claimsByIdBySubject[subject][claimId].uri
-        );
-
-        delete _claimsByIdBySubject[subject][claimId];
-
-        return true;
+        return revokeClaim(_claimByHash[claimHash]);
     }
 
     // Revoke a claim previously issued, the claim is no longer considered as valid after revocation.
     function revokeClaim(
-        bytes32 claimId,
-        address subject
+        uint256 claim
     )
         public
-        override
+        onlyIssuer(claim)
         returns(bool)
     {
-        uint256 topic;
-        uint256 scheme;
-        address issuer;
-        bytes memory sig;
-        bytes memory data;
-        string memory uri;
+        _claimValidity[claim] = false;
 
-        (topic, scheme, issuer, sig, data, uri) = getClaim(claimId, subject);
+        return true;
+    }
 
-        _revokedBySig[sig] = true;
+    // Remove a claim 
+    function removeClaimByHash(
+        bytes32 claimHash
+    )
+        public
+        returns (bool success)
+    {
+        return removeClaim(_claimByHash[claimHash]);
+    }
+
+    // Remove a signed attestation 
+    function removeClaim(
+        uint256 claim
+    )
+        public
+        onlyIssuer(claim)
+        returns (bool success)
+    {
+        // Sanity checks
+        if (_claims[claim].topic == 0)
+            revert NonExistantClaim();
+
+        delete _claimValidity[claim];
+        delete _claimByHash[keccak256(abi.encode(_claims[claim].issuer, _claims[claim].topic))];
+
+        delete _claimsBySubject[_claims[claim].subject];
+        delete _claimsByTopicBySubject[_claims[claim].subject][_claims[claim].topic];
+        delete _claimsByIssuer[_claims[claim].issuer];
+        delete _claimsByTopicByIssuer[_claims[claim].issuer][_claims[claim].topic];
+
+        // Events
+        emit ClaimRemoved(
+            claim,
+            _claims[claim].topic,
+            _claims[claim].scheme,
+            _claims[claim].issuer,
+            _claims[claim].subject,
+            _claims[claim].uri
+        );
+
+        delete _claims[claim];
 
         return true;
     }
@@ -171,8 +184,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         uint256[] calldata trustedTopics
     )
         external
-        override
         onlyOwner
+        returns (uint256)
     {
         // Sanity checks
         if (0 != _verifierTrustedTopics[verifier].length )
@@ -188,6 +201,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
 
         // Event
         emit TrustedVerifierAdded(verifier, trustedTopics);
+
+        return _verifiers.length;
     }
 
     // Remove a trusted verifier 
@@ -195,7 +210,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         address verifier
     )
         external
-        override
         onlyOwner
     {
         // Sanity checks
@@ -224,7 +238,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         uint256[] calldata trustedTopics
     )
         external
-        override
         onlyOwner
     {
         // Sanity checks
@@ -244,157 +257,100 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
     // GETTERS
     //////////////////////////////////////////////
     
+    // 
+    function getClaimByHash(
+        bytes32 hash
+    )
+        public 
+        view
+        returns(uint256)
+    {
+        return _claimByHash[hash];
+    }
+
+    // 
+    function getClaimsBySubject(
+        address subject
+    )
+        public 
+        view
+        returns(uint256[] memory)
+    {
+        return _claimsBySubject[subject];
+    }
+
+    // 
+    function getClaimsSubjectTopic(
+        address subject,
+        uint256 topic
+    )
+        public 
+        view
+        returns(uint256)
+    {
+        return _claims[];
+    }
+
+    // 
+    function getClaimsByIssuer(
+        address issuer
+    )
+        public 
+        view
+        returns(uint256[] memory)
+    {
+        return _claimsByIssuer[issuer];
+    }
+
+    // 
+    function getClaimsIssuerTopic(
+        address issuer,
+        uint256 topic
+    )
+        public 
+        view
+        returns(uint256)
+    {
+        return _claimsByIssuer[issuer][topic];
+    }
+    
     // Return all the fields for a claim by the subject address and the claim id (hash of topic and issuer)
     function getClaim(
-        bytes32 claimId,
-		address subject
+        uint256 claim
     )
         public
-        override
         view
         returns (
             uint256,
             uint256,
             address,
-            bytes memory,
-            bytes memory,
             string memory
         )
     {
         return (
-            _claimsByIdBySubject[subject][claimId].topic,
-            _claimsByIdBySubject[subject][claimId].scheme,
-            _claimsByIdBySubject[subject][claimId].issuer,
-            _claimsByIdBySubject[subject][claimId].sig,
-            _claimsByIdBySubject[subject][claimId].data,
-            _claimsByIdBySubject[subject][claimId].uri
+            _claims[claim].topic,
+            _claims[claim].scheme,
+            _claims[claim].issuer,
+            _claims[claim].uri
         );
     }
 
-    // Returns the claims of a given topic by subject address and topic 
-    function getClaimIdsByTopic(
-		address subject,
-        uint256 topic
-    )
-        public
-        override
-        view
-        returns(bytes32[] memory claimIds)
-    {
-        return _claimIdsByTopicsBySubject[subject][topic];
-    }
-
-    // #TODO: refactor for ERC-2771?
-    // Get address from sig
-    function getRecoveredAddress(
-        bytes memory sig,
-        bytes32 dataHash
-    )
-        public
-        override
-        pure
-        returns (address addr)
-    {
-        bytes32 ra;
-        bytes32 sa;
-        uint8 va;
-
-        // Check the sig length
-        if (sig.length != 65)
-            return address(0);
-
-        // Divide the sig in r, s and v variables
-        assembly {
-            ra := mload(add(sig, 32))
-            sa := mload(add(sig, 64))
-            va := byte(0, mload(add(sig, 96)))
-        }
-
-        if (va < 27)
-            va += 27;
-
-        address recoveredAddress = ecrecover(dataHash, va, ra, sa);
-
-        return (recoveredAddress);
-    }
-
-    ////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////
     // CHECKS
-    ////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////
 
-    // Checks if claim is valid by id.
-    function checkIsClaimValidById(
-        address subject,    
-        bytes32 claimId
-    )
-        public
-        override
-        view
-        returns (bool claimValid)
-    {
-        return checkIsClaimValid(_claimsByIdBySubject[subject][claimId].subject, _claimsByIdBySubject[subject][claimId].topic, _claimsByIdBySubject[subject][claimId].sig, _claimsByIdBySubject[subject][claimId].data);
-    }
-
-    // #TODO: this is basically redundant? Or is broken
-    // Checks if a claim is valid.
-    function checkIsClaimValid(
-        address subject,
-        uint256 topic,
-        bytes memory sig,
-        bytes memory data
-    )
-        public
-        override
-        view
-        returns (bool claimValid)
-    {
-        bytes32 dataHash = keccak256(abi.encode(subject, topic, data));
-        
-        // Use abi.encodePacked to concatenate the message prefix and the message to sign.
-        bytes32 prefixedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", dataHash));
-
-        // Recover address of data signer
-        address recovered = getRecoveredAddress(sig, prefixedHash);
-
-        // Take hash of recovered address
-        bytes32 hashedAddr = keccak256(abi.encode(recovered));
-
-        // Does the trusted identifier have they key which signed the user's claim?
-        if (checkIsClaimRevoked(sig) == false)
-            return true;
-
-        return false;
-    }
-
-    // Returns revocation status of a claim.
-    function checkIsClaimRevoked(
-        bytes memory _sig
-    )
-        public
-        override
-        view
-        returns (bool)
-    {
-        if (_revokedBySig[_sig])
-            return true;
-
-        return false;
-    }
-    
     // Checks if address is verifier
     function checkIsVerifier(
         address verifier
     )
-        external
+        public
         view
-        override
         returns (bool)
     {
         for (uint256 i = 0; i < _verifiers.length; i++)
-            if (_verifiers[i] == verifier) {
+            if (_verifiers[i] == verifier)
                 return true;
-            }
-        
+                
         return false;
     }
 
@@ -403,18 +359,53 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         address verifier,
         uint256 topic
     )
-        external
+        public
         view
-        override
         returns (bool)
     {
         // Iterate through checking for claim topic
         for (uint256 i = 0; i < _verifierTrustedTopics[verifier].length; i++)
-            if (_verifierTrustedTopics[verifier][i] == topic) {
+            if (_verifierTrustedTopics[verifier][i] == topic)
                 return true;
-            }
 
         return false;
+    }
+
+    // Checks if claim is valid by id.
+    function checkIsClaimValidByHash(
+        bytes32 hash
+    )
+        public
+        view
+        returns (bool claimValid)
+    {
+        return checkIsClaimValid(_claimByHash[hash]);
+    }
+
+    // Checks if a claim is valid.
+    function checkIsClaimValid(
+        uint256 claim
+    )
+        public
+        view
+        returns (bool claimValid)
+    {
+        if (_claimValidity[claim] && checkIsVerifier(_claims[claim].issuer) )
+            if (checkIsVerifierTrustedTopic(_claims[claim].issuer, _claims[claim].topic))
+                return true;
+
+        return false;
+    }
+
+    // Returns revocation status of a claim.
+    function checkIsClaimRevoked(
+        uint256 claim
+    )
+        public
+        view
+        returns (bool)
+    {
+        return _claimValidity[claim];
     }
 
 }

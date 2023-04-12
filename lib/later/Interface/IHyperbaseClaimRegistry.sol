@@ -26,7 +26,7 @@ interface IHyperbaseClaimRegistry {
     
     function checkIsVerifier(address verifier) external view returns (bool);
     function checkIsVerifierTrustedTopic(address verifier, uint256 topic) external view returns (bool);
-    function checkIsClaimValidById(address subject, bytes32 claimId) external view returns (bool claimValid);
+    function checkIsClaimValidByHash(address subject, bytes32 claimId) external view returns (bool claimValid);
     function checkIsClaimValid(address subject, uint256 topic, bytes memory sig, bytes memory data) external view returns (bool claimValid);
     function checkIsClaimRevoked(bytes memory sig) external view returns (bool);
 }

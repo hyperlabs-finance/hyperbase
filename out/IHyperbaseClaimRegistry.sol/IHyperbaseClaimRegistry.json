@@ -424,7 +424,7 @@
           "type": "bytes32"
         }
       ],
-      "name": "checkIsClaimValidById",
+      "name": "checkIsClaimValidByHash",
       "outputs": [
         {
           "internalType": "bool",
@@ -670,7 +670,7 @@
     "addTrustedVerifier(address,uint256[])": "81e45bd2",
     "checkIsClaimRevoked(bytes)": "bc99e190",
     "checkIsClaimValid(address,uint256,bytes,bytes)": "45b2b682",
-    "checkIsClaimValidById(address,bytes32)": "be4a5040",
+    "checkIsClaimValidByHash(address,bytes32)": "be4a5040",
     "checkIsVerifier(address)": "f0f40189",
     "checkIsVerifierTrustedTopic(address,uint256)": "c4460975",
     "getClaim(bytes32,address)": "9d030de1",
@@ -3136,7 +3136,7 @@
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "checkIsClaimValidById",
+            "name": "checkIsClaimValidByHash",
             "nameLocation": "4239:21:4",
             "parameters": {
               "id": 1454,
