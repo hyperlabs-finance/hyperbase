@@ -5,6 +5,13 @@ pragma solidity ^0.8.6;
 interface IHyperbaseIdentityRegistry {
 
   	////////////////
+    // ERRORS
+    ////////////////
+
+    // Only the identity owner can call this function
+    error OnlyIdentity();
+	
+  	////////////////
     // EVENTS
     ////////////////
 
@@ -220,7 +227,7 @@ interface IHyperbaseIdentityRegistry {
 		Zambia,
 		Zimbabwe
 	}
-    
+	
     //////////////////////////////////////////////
     // CREATE | DELETE IDENTITY
     //////////////////////////////////////////////

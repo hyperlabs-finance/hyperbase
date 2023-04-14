@@ -27,10 +27,12 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
     // MODIFIERS
     ////////////////
 
+    // Ensure that only the identity owner can call this function
 	modifier onlyIdentity(
 		uint256 identity
 	) {
-        require(_identitiesByAddress[msg.sender] == identity, "Only the owner of an identity can make changes to it");
+        if (_identitiesByAddress[msg.sender] != identity)
+            revert OnlyIdentity();
 		_;
 	}
 

@@ -20,12 +20,40 @@ contract Hyperbase is IHyperbase, ERC2771Context {
 
     using Timers for Timers.BlockNumber;
     using SafeCast for uint256;
+
+  	////////////////
+    // ERRORS
+    ////////////////
     
+    // Key has already been added to the account
+    error KeyAlreadyExists();
+
+    // Key has not been added to the account
+    error KeyDoesNotExists();
+
+    // Transaction already has already been submitted
+    error TransactionAlreadyExists();
+
+    // Key has not approved the transaction
+    error KeyNotApproved();
+
+    // Key has already approved the transaction
+    error KeyAlreadyApproved();
+
+    // Transactionn has already been executed
+    error TransactionAlreadyExecuted();
+
+    // Key is zero address
+    error KeyIsZeroAddress();
+
+    // Key does not have permission for the transaction
+    error KeyDoesNotHavePermission();
+
   	////////////////
     // CONSTANTS
     ////////////////
 
-    // 
+    // The token used for refunds
     address GAS_TOKEN;
 
     // Maximum keys
@@ -38,7 +66,6 @@ contract Hyperbase is IHyperbase, ERC2771Context {
     // STATE
     ////////////////
 
-    // 
     address claimsRegistry;
 
     struct Key {
@@ -47,13 +74,13 @@ contract Hyperbase is IHyperbase, ERC2771Context {
         bool exists;
     }
 
-	// All keys on the acapprovalCount
+	// All keys on the approvalCount
     Key[] public _keys;
 
-    // Mapping from address to key
+    // Mapping from address to key index
     mapping(address => uint256) _keysByAddress;
 
-    // Mapping from 
+    // Mapping from permission to key indexs
     mapping(uint256 => uint256[]) _keysByPermission;
 
     // Mapping from permission const to amount of sigs required
@@ -133,24 +160,27 @@ contract Hyperbase is IHyperbase, ERC2771Context {
         _;
     }
 
-    modifier keyDoesNotExist(
+    modifier keyNotExist(
 		address key
 	) {
-        require(!_keys[_keysByAddress[key]].exists);
+        if (_keys[_keysByAddress[key]].exists)
+            revert KeyAlreadyExists();
         _;
     }
 
-    modifier keyExists(
+    modifier keyExist(
 		address key
 	) {
-        require(_keys[_keysByAddress[key]].exists);
+        if (!_keys[_keysByAddress[key]].exists)
+            revert KeyDoesNotExists();
         _;
     }
 
-    modifier transactionExists(
+    modifier transactionExist(
 		uint256 txHash
 	) {
-        require(uint256(_transactions[_transactionsByHash[txHash]].required) != 0);
+        if (uint256(_transactions[_transactionsByHash[txHash]].required) == 0) 
+            revert TransactionAlreadyExists();
         _;
     }
 
@@ -158,7 +188,8 @@ contract Hyperbase is IHyperbase, ERC2771Context {
 		uint256 txHash,
 		address key
 	) {
-        require(_approvalsByTransaction[_transactionsByHash[txHash]][key]);
+        if (!_approvalsByTransaction[_transactionsByHash[txHash]][key])
+            revert KeyNotApproved();
         _;
     }
 
@@ -166,21 +197,24 @@ contract Hyperbase is IHyperbase, ERC2771Context {
 		uint256 txHash,
 		address key
 	) {
-        require(!_approvalsByTransaction[_transactionsByHash[txHash]][key]);
+        if (_approvalsByTransaction[_transactionsByHash[txHash]][key])
+            revert KeyAlreadyApproved();
         _;
     }
 
     modifier notExecuted(
 		uint256 txHash
 	) {
-        require(_transactions[_transactionsByHash[txHash]].status != Status.EXECUTED);
+        if (_transactions[_transactionsByHash[txHash]].status == Status.EXECUTED)
+            revert TransactionAlreadyExecuted();
         _;
     }
 
     modifier notNull(
 		address key
 	) {
-        require(key != address(0));
+        if (key == address(0))
+            revert KeyIsZeroAddress();
         _;
     }
 
@@ -190,21 +224,22 @@ contract Hyperbase is IHyperbase, ERC2771Context {
         uint256[] memory values,
         bytes[] memory calldatas
     ) {
-        require(uint8(_keys[_keysByAddress[key]].permission) < uint8(getRequiredPermission(targets, values, calldatas)));
+        if (uint8(getRequiredPermission(targets, values, calldatas)) < uint8(_keys[_keysByAddress[key]].permission))
+            revert KeyDoesNotHavePermission();
         _;
     }
 
-    // #TODO
     modifier validRequirement(
 		uint8 keyCount,
-		uint8 required
+        Permission permission
 	) {
-        require(
-            keyCount <= MAX_KEY_COUNT &&
-            required <= keyCount &&
-            required != 0 &&
-            keyCount != 0
-        );
+        if (
+            MAX_KEY_COUNT <= keyCount &&
+            keyCount <= _requiredByPermission[permission] &&
+            _requiredByPermission[permission] == 0 &&
+            keyCount == 0
+        )
+            revert InvalidRequirement();
         _;
     }
 
@@ -219,9 +254,9 @@ contract Hyperbase is IHyperbase, ERC2771Context {
 	)
         public
         onlyThis
-        keyDoesNotExist(key)
+        keyNotExist(key)
         notNull(key)
-        // validRequirement(_keys.length + 1, _required)
+        validRequirement(_keys.length + 1, permission)
     {
         // Create key
         Key memory keyObj =  Key(
@@ -242,7 +277,7 @@ contract Hyperbase is IHyperbase, ERC2771Context {
 	)
         public
         onlyThis
-        keyExists(key)
+        keyExist(key)
     {
         // Sanity checks
         require(1 < (_keys.length - 1), "Hyperbase: Cannot have zero keys");
@@ -267,8 +302,8 @@ contract Hyperbase is IHyperbase, ERC2771Context {
 	)
         public
         onlyThis
-        keyExists(key)
-        keyDoesNotExist(newKey)
+        keyExist(key)
+        keyNotExist(newKey)
     {
         // Add key
         addKey(newKey, _keys[_keysByAddress[key]].permission);
@@ -360,7 +395,7 @@ contract Hyperbase is IHyperbase, ERC2771Context {
         bool approved
     )
         public
-        keyExists(_msgSender())
+        keyExist(_msgSender())
         keyHasRequiredPermission(_msgSender(), _transactions[_transactionsByHash[txHash]].targets, _transactions[_transactionsByHash[txHash]].values, _transactions[_transactionsByHash[txHash]].calldatas)
         notApproved(txHash, _msgSender())
         notExecuted(txHash)
@@ -381,7 +416,7 @@ contract Hyperbase is IHyperbase, ERC2771Context {
         uint256 txHash
     )
         public
-        keyExists(_msgSender())
+        keyExist(_msgSender())
         hasApproved(txHash, _msgSender())
         notExecuted(txHash)
     {
@@ -401,7 +436,7 @@ contract Hyperbase is IHyperbase, ERC2771Context {
         public
         payable
         virtual
-        keyExists(_msgSender())
+        keyExist(_msgSender())
         hasApproved(getTransactionHash(targets, values, calldatas), _msgSender())
         notExecuted(getTransactionHash(targets, values, calldatas))
         returns (uint256)
@@ -678,7 +713,7 @@ contract Hyperbase is IHyperbase, ERC2771Context {
     )
         public
         onlyThis
-        // validRequirement(_keys.length, required)
+        validRequirement(_keys.length, required)
     {
         _requiredByPermission[permission] = required;
         emit RequirementChange(uint8(permission), required);

@@ -59,17 +59,45 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
     // MODIFIERS
     ////////////////
 
-    // Require caller is claim isser 
+    // Ensure caller is claim isser 
     modifier onlyIssuer(uint256 claim) {
         if (_msgSender() != _claims[claim].issuer)
             revert NotIssuer();
         _;
     }
 
-    // Require caller is claim isser or claim subject
+    // Ensure caller is claim isser or claim subject
     modifier onlyIssuerOrSubject(uint256 claim) {
         if (_msgSender() != _claims[claim].issuer || _msgSender() != _claims[claim].subject)
             revert NotIssuerOrSubject();
+        _;
+    }
+
+    // Ensure claim exists
+    modifier claimExists(uint256 claim) {
+        if (_claims[claim].topic == 0)
+            revert NonExistantClaim();
+        _;
+    }
+
+    // Ensure the verifier does not already exist
+    modifier verifierNotExist(address verifier) {
+        if (0 != _verifierTrustedTopics[verifier].length )
+            revert VerifierAlreadyExists();
+        _;
+    }   
+
+    // Ensure the verifier already exists
+    modifier verifierExists(address verifier) {
+        if (_verifierTrustedTopics[verifier].length == 0)
+            revert NonExistantVerifier();
+        _;
+    }
+
+    // Ensure the submitted topics are not empty
+    modifier notEmptyTopics(address verifier) {
+        if (0 == t  rustedTopics.length)
+            revert EmptyClaimTopics();
         _;
     }
 
@@ -131,11 +159,9 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
     )
         public
         onlyIssuer(claim)
+        claimExists(claim)
         returns (bool success)
     {
-        // Sanity checks
-        if (_claims[claim].topic == 0)
-            revert NonExistantClaim();
 
         delete _claimValidity[claim];
 
@@ -170,15 +196,11 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
     )
         external
         onlyOwner
+        verifierNotExist(verifier)
+        notEmptyTopics(trustedTopics)
         returns (uint256)
     {
-        // Sanity checks
-        if (0 != _verifierTrustedTopics[verifier].length )
-            revert VerifierAlreadyExists();
-        if (0 == trustedTopics.length)
-            revert EmptyClaimTopics();
-
-        // Add verifier
+// Add verifier
         _verifiers.push(verifier);
 
         // Add trusted topics
@@ -195,12 +217,9 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         address verifier
     )
         external
+        verifierExists(verifier)
         onlyOwner
     {
-        // Sanity checks
-        if (_verifierTrustedTopics[verifier].length == 0)
-            revert NonExistantVerifier();
-
         // Iterate through and remove
         for (uint256 i = 0; i < _verifiers.length; i++)
             if (_verifiers[i] == verifier) {
@@ -223,14 +242,10 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         uint256[] calldata trustedTopics
     )
         external
+        verifierExists(verifier)
+        notEmptyTopics(trustedTopics)
         onlyOwner
     {
-        // Sanity checks
-        if (0 == _verifierTrustedTopics[verifier].length)
-            revert NonExistantVerifier();
-        if (0 < trustedTopics.length)
-            revert EmptyClaimTopics();
-
         // Update
         _verifierTrustedTopics[verifier] = trustedTopics;
 
@@ -372,7 +387,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
     }
 
     //////////////////////////////////////////////
-    // OWNABLE
+    // OWNABLE (was throwing multiple inheritance error)
     //////////////////////////////////////////////
 
     address private _owner;
