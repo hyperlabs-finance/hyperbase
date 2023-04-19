@@ -168,5 +168,4 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 	{
 		return uint16(_identities[identity].country);
 	}
-	
 }

@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.6;
 
+import './Utils/Ownable.sol';
 import '../Interface/IHyperbaseClaimRegistry.sol';
-import 'openzeppelin-contracts/contracts/metatx/ERC2771Context.sol';
 
-contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
+contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
 
   	////////////////
     // STATE
@@ -24,18 +24,20 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
 
     // Mapping from claim id to claim validity
     mapping(uint256 => bool) _claimValidity;
-    
+
     // Mapping from address of subject to all claims to claim ids
     mapping(address => uint256[]) _claimsBySubject;
-    
+
     // Mapping from subject address to topic to claim ids
     mapping(address => mapping(uint256 => uint256[])) _claimsByTopicBySubject; 
 
     // Mapping from issuer 
     mapping(address => uint256[]) _claimsByIssuer;
-    
+
     // Mapping from subject address to topic to claim ids
     mapping(address => mapping(uint256 => uint256[])) _claimsByTopicByIssuer; 
+    
+    
 
     // Array of all trusted _verifiers i.e. kyc agents, etc
     address[] public _verifiers;
@@ -50,10 +52,8 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
 	constructor(
 		address forwarder
 	)
-		ERC2771Context(forwarder) 
-	{
-        _transferOwnership(_msgSender());
-    }
+		ERC2771Context(forwarder)
+	{}
 
   	////////////////
     // MODIFIERS
@@ -162,9 +162,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         claimExists(claim)
         returns (bool success)
     {
-
         delete _claimValidity[claim];
-
         delete _claimsBySubject[_claims[claim].subject];
         delete _claimsByTopicBySubject[_claims[claim].subject][_claims[claim].topic];
         delete _claimsByIssuer[_claims[claim].issuer];
@@ -200,7 +198,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         notEmptyTopics(trustedTopics)
         returns (uint256)
     {
-// Add verifier
+        // Add verifier
         _verifiers.push(verifier);
 
         // Add trusted topics
@@ -227,7 +225,6 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
                 _verifiers.pop();
                 break;
             }
-        
 
         // Delete from 
         delete _verifierTrustedTopics[verifier];
@@ -257,7 +254,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
     // GETTERS
     //////////////////////////////////////////////
     
-    // 
+    // Return the claims for a given subject
     function getClaimsBySubject(
         address subject
     )
@@ -268,7 +265,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         return _claimsBySubject[subject];
     }
     
-    // 
+    // Return the claims for a given subject and topic
     function getClaimsSubjectTopic(
         address subject,
         uint256 topic
@@ -280,7 +277,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         return _claimsByTopicBySubject[subject][topic];
     }
 
-    // 
+    // Returns all the claims issued by an issuer
     function getClaimsByIssuer(
         address issuer
     )
@@ -291,7 +288,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         return _claimsByIssuer[issuer];
     }
 
-    // 
+    // Returns all the claims issued by an issuer for a given topic
     function getClaimsIssuerTopic(
         address issuer,
         uint256 topic
@@ -303,7 +300,7 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         return _claimsByTopicByIssuer[issuer][topic];
     }
     
-    // Return all the fields for a claim by the subject address and the claim id 
+    // Return all the fields for a claim
     function getClaim(
         uint256 claim
     )
@@ -384,58 +381,5 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, ERC2771Context {
         returns (bool)
     {
         return _claimValidity[claim];
-    }
-
-    //////////////////////////////////////////////
-    // OWNABLE (was throwing multiple inheritance error)
-    //////////////////////////////////////////////
-
-    address private _owner;
-
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    /**
-     * @dev Returns the address of the current owner.
-     */
-    function owner() public view virtual returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
-        _;
-    }
-
-    /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore. Can only be called by the current owner.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     */
-    function renounceOwnership() public virtual onlyOwner {
-        _transferOwnership(address(0));
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Can only be called by the current owner.
-     */
-    function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        _transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Internal function without access restriction.
-     */
-    function _transferOwnership(address newOwner) internal virtual {
-        address oldOwner = _owner;
-        _owner = newOwner;
-        emit OwnershipTransferred(oldOwner, newOwner);
     }
 }

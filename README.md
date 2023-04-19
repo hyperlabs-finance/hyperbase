@@ -1,14 +1,14 @@
 # Hyperbase
 
-In many ways, Blockchain today is like the first generation of the web. While the technical infrastructure is established and capable of supporting use at scale, a relatively small number of key usability issues present a far greater barrier to adoption than the underlying technology.
+In many ways, Blockchain technology today is like the first generation of the web. While the technical infrastructure is established and capable of supporting use at scale a relatively small number of key usability issues present a far greater barrier to adoption than the underlying technology.
 
-It is our conclusion that for blockchain-based applications to achieve mainstream commercial success, the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level, rather than a necessary pastime for anyone who wishes to participate.
+It is our conclusion that for blockchain-based applications to achieve mainstream commercial success, the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level rather than a necessary pastime for anyone who wishes to participate.
 
 ## Barriers to Adoption
-Although the potential of blockchain technology is increasingly recognised across industries the typical approach to building applications has changed remarkably little. Even in 2023, blockchain applications make little provision for non-technical users. This design philosophy is best categorised as: “by developers, for developers”. 
+Although the potential of blockchain technology is increasingly recognised across industries, the typical approach to building applications has changed remarkably little. Even in 2023, blockchain applications make suprisingly little provision for non-technical users. This design philosophy is perhaps best described as, “by developers, for developers”. 
 
 #### Application Design
-The vast majority of blockchain applications seem more like control panels than consumer-ready apps. Accompanying applications is little in the way of walkthroughs or guidance. While this may be adequate for tech-savvy early-adopters or “degens”, for the average user such experiences are generally off-putting. 
+The majority of blockchain applications seem more like control panels than consumer-ready apps. Accompanying applications is little in the way of walkthroughs or guidance. While this may be adequate for tech-savvy early-adopters or “degens”, for the average user such experiences are generally off-putting. 
 
 #### Addresses 
 Although 42-character public keys may be easily parsed by machines, to humans they are nearly incomprehensible. If an address is wrong even by a single character then funds and assets may be lost permanently. Public keys contribute to a feeling of overwhelm that is often enough to discourage newcomers
@@ -24,9 +24,17 @@ In the blockchain ecosystem, onboarding is almost always tedious and frustrating
 
 # Hyperbase Accounts
 
-{.... Should this go to the introduction ?}
+Our solution is Hyperbase: a suite of tools for identity-based interactions on-chain. Hyperbase consists of 
 
-Our solution is Hyperbase: a simple but powerful decentralised account model. 
+Hyperbase account is a lightweight multisiganture 
+
+Identity registry
+
+Claims 
+
+Token curated list 
+
+# Hyperbase Accounts
 
 Hyperbase provides drastic improvements over current designs by abstracting all the riskiest, most intimidating, and otherwise inconvenient aspects out of the user's experience. It does so while still providing the full benefits of decentralisation.
 
@@ -84,7 +92,7 @@ In order to execute a transaction from a Hyperbase user account:
 ### User Account Access
 
 To access a user account:
-1. The user inputs a personal account subdomain: “bob.hype.surf”
+1. The user inputs a personal account subdomain: “bob.hyper.surf”
 a. If the user has an account and key:
 i. The local key is used to sign and send the transaction via relay.
 b. If the user has an account but no key:
@@ -118,14 +126,6 @@ Users may sign claims attesting to statements about themselves or other accounts
 
 With trust secured by a tamper-proof digital ledger, compliant parties can participate with greatly reduced friction. Claims enable information to be verified near-instantly, allowing smart contracts to validate the identities of users on-chain. This has significant implications for issuers as it enables transfer controls and compliance to be automated and enforced at the protocol level.
 
-## Verifiers
-
-Hypersurface aims to establish a global, integrated, and compliant ecosystem for tokenised assets, starting with tokenised equity. However, with the vast scope and subtleties of regulation across jurisdictions to preserve its status as an infrastructure platform and to provide a solution that is truly decentralised, the Hypersurface protocol will provide a platform for an ecosystem of “verifiers”. Verifiers serve as trusted third parties that provide credentialing solutions for the Hypersurface community. 
-
-Rather than introducing itself as a bottleneck, Hypersurface will provide a broad platform and marketplace for organisations to verify statements in a formal capacity. In exchange for economic incentives, which may be paid in fiat currency, protocol tokens or other crypto assets, verifiers issue claim signatures attesting to the accuracy of a given piece of information about identity. Anyone who knows that a trusted verifier has checked and signed a claim can be confident in the accuracy of a claim without needing to verify it themselves.
-
-Working with an ecosystem of enables Hypersurface to effectively scale across jurisdictions without having to seek the appropriate licences and approvals for each and every region.
-
 ### Claim Verification
 
 We expect claims to play an important part in the Hypersurface ecosystem, taking on a more diverse role as the Hypersurface ecosystem grows. However, initially, claims will be used as a means of verifying statements in credential-related interactions. An example of the verification process for a credential-based interaction is:
@@ -140,4 +140,31 @@ c. A citizen of a given jurisdiction.
 5. After a successful KYC process, AcmeKYC signs the appropriate claims for the prospective investor's identity account.
 6. When a share transfer is attempted to the prospective investor the compliance smart contract verifies the receiver's claims and approves the transfer.
 
-Beyond whitelisting, claims serve to add fidelity to interactions, allowing issuers to permit transfers automatically. Whereas previously issuers would have required complete control and would manually verify who becomes a shareholder, claims allow issuers to specify terms that shareholders must meet before they are eligible to receive shares. This enables issuers to automate transfers, which we believe will enable for greatly enhanced transferability and liquidity.
+Beyond whitelisting, claims serve to add trust to interactions, allowing issuers to permit transfers automatically. Whereas previously issuers would have required complete control and would manually verify who becomes a shareholder, claims allow issuers to specify terms that shareholders must meet before they are eligible to receive shares. This enables issuers to automate transfers, which we believe will enable for greatly enhanced transferability and liquidity.
+
+## Verifiers
+
+Hypersurface aims to establish a global, integrated, and compliant ecosystem for tokenised assets, starting with tokenised equity. However, with the vast scope and subtleties of regulation across jurisdictions to preserve its status as an infrastructure platform and to provide a solution that is truly decentralised, the Hypersurface protocol will provide a platform for an ecosystem of “verifiers”. Verifiers serve as trusted third parties that provide credentialing solutions for the Hypersurface community. 
+
+Rather than introducing itself as a bottleneck, Hypersurface will provide a broad platform and marketplace for organisations to verify statements in a formal capacity. In exchange for economic incentives, which may be paid in fiat currency, protocol tokens or other crypto assets, verifiers issue claim signatures attesting to the accuracy of a given piece of information about identity. Anyone who knows that a trusted verifier has checked and signed a claim can be confident in the accuracy of a claim without needing to verify it themselves.
+
+## Verifiers Registry
+
+To 
+
+Working with an ecosystem of enables Hypersurface to effectively scale across jurisdictions without having to seek the appropriate licences and approvals for each and every region.
+
+	are used to incentivize quality curation of information. 
+
+{single point failure, decentralised}
+
+{token-curated list that is fully decentralised, can be used within the protocol or without}
+
+{example verifications are that they verify an offering}
+
+
+
+
+Add to registry
+
+Challenge 
