@@ -2,15 +2,31 @@
 
 pragma solidity ^0.8.6;
 
-import './Utils/Ownable.sol';
+// Inherits
+import 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import '../Interface/IHyperbaseClaimRegistry.sol';
 
+// Interfaces
+import '../Interface/IHyperbaseVerifiersRegistry.sol';
+
 contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
+
+  	////////////////
+    // INTERFACES
+    ////////////////
+
+    /**
+     * @dev The registry of accounts that are authorised to provide claims on particular topics.
+     */
+    IHyperbaseVerifiersRegistry _verifiers;
 
   	////////////////
     // STATE
     ////////////////
 
+    /**
+     * @dev Records the neccesary fields for a claim. 
+     */
     struct Claim {
         uint256 topic;
         uint256 scheme;
@@ -19,85 +35,75 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         string uri;
     }
 
-    // Array of all claims
+    /**
+     * @dev Array of all claims.
+     */
     Claim[] _claims;
 
-    // Mapping from claim id to claim validity
+    /**
+     * @dev Mapping from claim ID to claim validity.
+     */
     mapping(uint256 => bool) _claimValidity;
 
-    // Mapping from address of subject to all claims to claim ids
+    /**
+     * @dev Mapping from address of subject to all claims to claim IDs.
+     */
     mapping(address => uint256[]) _claimsBySubject;
 
-    // Mapping from subject address to topic to claim ids
+    /**
+     * @dev Mapping from subject address to topic to claim IDs.
+     */
     mapping(address => mapping(uint256 => uint256[])) _claimsByTopicBySubject; 
 
-    // Mapping from issuer 
+    /**
+     * @dev Mapping from issuer.
+     */
     mapping(address => uint256[]) _claimsByIssuer;
 
-    // Mapping from subject address to topic to claim ids
+    /**
+     * @dev Mapping from subject address to topic to claim IDs.
+     */
     mapping(address => mapping(uint256 => uint256[])) _claimsByTopicByIssuer; 
-    
-    
-
-    // Array of all trusted _verifiers i.e. kyc agents, etc
-    address[] public _verifiers;
-
-    // Mapping between a trusted verifier address and the corresponding topics it's trusted to verify i.e. Accredited, HNWI, etc.
-    mapping(address => uint256[]) public _verifierTrustedTopics;
 
   	////////////////
     // CONSTRUCTOR
     ////////////////
 		
 	constructor(
-		address forwarder
+        address verifiers
 	)
-		ERC2771Context(forwarder)
-	{}
+	{
+        setVerifiers(verifiers);
+    }
 
   	////////////////
     // MODIFIERS
     ////////////////
 
-    // Ensure caller is claim isser 
+    /**
+     * @dev Ensures the caller is claim isser. 
+     */
     modifier onlyIssuer(uint256 claim) {
         if (_msgSender() != _claims[claim].issuer)
             revert NotIssuer();
         _;
     }
 
-    // Ensure caller is claim isser or claim subject
+    /**
+     * @dev Ensures the caller is claim isser or claim subject.
+     */
     modifier onlyIssuerOrSubject(uint256 claim) {
         if (_msgSender() != _claims[claim].issuer || _msgSender() != _claims[claim].subject)
             revert NotIssuerOrSubject();
         _;
     }
 
-    // Ensure claim exists
+    /**
+     * @dev Ensures the claim exists.
+     */
     modifier claimExists(uint256 claim) {
         if (_claims[claim].topic == 0)
             revert NonExistantClaim();
-        _;
-    }
-
-    // Ensure the verifier does not already exist
-    modifier verifierNotExist(address verifier) {
-        if (0 != _verifierTrustedTopics[verifier].length )
-            revert VerifierAlreadyExists();
-        _;
-    }   
-
-    // Ensure the verifier already exists
-    modifier verifierExists(address verifier) {
-        if (_verifierTrustedTopics[verifier].length == 0)
-            revert NonExistantVerifier();
-        _;
-    }
-
-    // Ensure the submitted topics are not empty
-    modifier notEmptyTopics(address verifier) {
-        if (0 == t  rustedTopics.length)
-            revert EmptyClaimTopics();
         _;
     }
 
@@ -105,7 +111,13 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
     // ADD | REMOVE | REVOKE CLAIMS
     //////////////////////////////////////////////
 
-    // Add a signed attestation
+    /**
+     * @dev Add a claim that a subject account has a given attribute.
+     * @param topic The topic the of the claim supports. 
+     * @param scheme The scheme of the claim topic.
+     * @param subject The user account the claim is about. 
+     * @param uri The uri for any supporting data.
+     */
     function addClaim(
         uint256 topic,
         uint256 scheme,
@@ -140,121 +152,36 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         emit ClaimAdded(claimId, topic, scheme, issuer, subject, uri);
     }
 
-    // Revoke a claim previously issued, the claim is no longer considered as valid after revocation.
+    /**
+     * @dev Revoking a claim keeping a recorded history of its existence but (most-likely) invalidating
+     * it for future interactions.
+     *
+     * @param claim The uint claim ID to revoke.
+     */
     function revokeClaim(
         uint256 claim
     )
         public
         onlyIssuer(claim)
+        claimExists(claim)
         returns(bool)
     {
         _claimValidity[claim] = false;
 
-        return true;
-    }
-
-    // Remove a signed attestation 
-    function removeClaim(
-        uint256 claim
-    )
-        public
-        onlyIssuer(claim)
-        claimExists(claim)
-        returns (bool success)
-    {
-        delete _claimValidity[claim];
-        delete _claimsBySubject[_claims[claim].subject];
-        delete _claimsByTopicBySubject[_claims[claim].subject][_claims[claim].topic];
-        delete _claimsByIssuer[_claims[claim].issuer];
-        delete _claimsByTopicByIssuer[_claims[claim].issuer][_claims[claim].topic];
-
-        // Events
-        emit ClaimRemoved(
-            claim,
-            _claims[claim].topic,
-            _claims[claim].scheme,
-            _claims[claim].issuer,
-            _claims[claim].subject,
-            _claims[claim].uri
-        );
-
-        delete _claims[claim];
+        // Event
+        emit ClaimRevoked(claim);
 
         return true;
-    }
-    
-    //////////////////////////////////////////////
-    // ADD | REMOVE VERIFIER
-    //////////////////////////////////////////////
-
-    // Add a trusted verifier
-    function addTrustedVerifier(
-        address verifier,
-        uint256[] calldata trustedTopics
-    )
-        external
-        onlyOwner
-        verifierNotExist(verifier)
-        notEmptyTopics(trustedTopics)
-        returns (uint256)
-    {
-        // Add verifier
-        _verifiers.push(verifier);
-
-        // Add trusted topics
-        _verifierTrustedTopics[verifier] = trustedTopics;
-
-        // Event
-        emit TrustedVerifierAdded(verifier, trustedTopics);
-
-        return _verifiers.length;
-    }
-
-    // Remove a trusted verifier 
-    function removeTrustedVerifier(
-        address verifier
-    )
-        external
-        verifierExists(verifier)
-        onlyOwner
-    {
-        // Iterate through and remove
-        for (uint256 i = 0; i < _verifiers.length; i++)
-            if (_verifiers[i] == verifier) {
-                _verifiers[i] = _verifiers[_verifiers.length - 1];
-                _verifiers.pop();
-                break;
-            }
-
-        // Delete from 
-        delete _verifierTrustedTopics[verifier];
-
-        // Event
-        emit TrustedVerifierRemoved(verifier);
-    }
-
-    // Update the topics a verifier can verify on
-    function updateVerifierClaimTopics(
-        address verifier,
-        uint256[] calldata trustedTopics
-    )
-        external
-        verifierExists(verifier)
-        notEmptyTopics(trustedTopics)
-        onlyOwner
-    {
-        // Update
-        _verifierTrustedTopics[verifier] = trustedTopics;
-
-        // Event
-        emit TrustedClaimTopicsUpdated(verifier, trustedTopics);
     }
     
     //////////////////////////////////////////////
     // GETTERS
     //////////////////////////////////////////////
     
-    // Return the claims for a given subject
+    /**
+     * @dev Returns the IDs of claims associated with subject address.
+     * @param subject The address of the subject that is being queried.
+     */
     function getClaimsBySubject(
         address subject
     )
@@ -265,7 +192,11 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         return _claimsBySubject[subject];
     }
     
-    // Return the claims for a given subject and topic
+    /**
+     * @dev Returns the claims for the subject by given topic.
+     * @param subject The address of the subject that is being queried.
+     * @param topic The topic of the claim that is being queried.
+     */
     function getClaimsSubjectTopic(
         address subject,
         uint256 topic
@@ -277,7 +208,10 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         return _claimsByTopicBySubject[subject][topic];
     }
 
-    // Returns all the claims issued by an issuer
+    /**
+     * @dev Returns the IDs of claims issued by issuer address.
+     * @param issuer The address of the claim issuer, typically a trusted verifier. 
+     */
     function getClaimsByIssuer(
         address issuer
     )
@@ -288,7 +222,11 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         return _claimsByIssuer[issuer];
     }
 
-    // Returns all the claims issued by an issuer for a given topic
+    /**
+     * @dev Returns all the claims issued by an issuer for a given topic.
+     * @param issuer The address of the claim issuer, typically a trusted verifier. 
+     * @param topic The topic of the claim that is being sought after.
+     */
     function getClaimsIssuerTopic(
         address issuer,
         uint256 topic
@@ -300,7 +238,10 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         return _claimsByTopicByIssuer[issuer][topic];
     }
     
-    // Return all the fields for a claim
+    /**
+     * @dev Return all the fields for a claim by the subject address and the claim ID
+     * @param claim The ID of the claim to return fields for.
+     */
     function getClaim(
         uint256 claim
     )
@@ -325,39 +266,10 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
     // CHECKS
     //////////////////////////////////////////////
 
-    // Checks if address is verifier
-    function checkIsVerifier(
-        address verifier
-    )
-        public
-        view
-        returns (bool)
-    {
-        for (uint256 i = 0; i < _verifiers.length; i++)
-            if (_verifiers[i] == verifier)
-                return true;
-                
-        return false;
-    }
-
-    // Account has claim topic
-    function checkIsVerifierTrustedTopic(
-        address verifier,
-        uint256 topic
-    )
-        public
-        view
-        returns (bool)
-    {
-        // Iterate through checking for claim topic
-        for (uint256 i = 0; i < _verifierTrustedTopics[verifier].length; i++)
-            if (_verifierTrustedTopics[verifier][i] == topic)
-                return true;
-
-        return false;
-    }
-
-    // Checks if a claim is valid.
+    /**
+     * @dev Checks if a claim is valid.
+     * @param claim The ID of the claim to return fields for.
+     */
     function checkIsClaimValid(
         uint256 claim
     )
@@ -365,14 +277,17 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
         view
         returns (bool claimValid)
     {
-        if (_claimValidity[claim] && checkIsVerifier(_claims[claim].issuer) )
-            if (checkIsVerifierTrustedTopic(_claims[claim].issuer, _claims[claim].topic))
+        if (_claimValidity[claim] && _verifiers.checkIsVerifier(_claims[claim].issuer))
+            if (_verifiers.checkIsVerifierTrustedTopic(_claims[claim].issuer, _claims[claim].topic))
                 return true;
 
         return false;
     }
 
-    // Returns revocation status of a claim.
+    /**
+     * @dev Returns revocation status of a claim.
+     * @param claim The ID of the claim to return fields for.
+     */
     function checkIsClaimRevoked(
         uint256 claim
     )
@@ -382,4 +297,24 @@ contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
     {
         return _claimValidity[claim];
     }
+    
+    //////////////////////////////////////////////
+    // SETTERS
+    //////////////////////////////////////////////
+    
+    /**
+     * @dev Sets the address of the trusted claim verifiers registry.
+     * @param verifiers Address of the verifiers registry.
+     */
+    function setVerifiers(
+        address verifiers
+    )
+        public 
+        onlyOwner
+    {
+        _verifiers = IHyperbaseVerifiersRegistry(verifiers);
+
+        emit VerifiersUpdated(verifiers);
+    }
+
 }

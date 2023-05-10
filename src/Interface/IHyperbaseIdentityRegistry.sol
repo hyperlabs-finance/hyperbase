@@ -8,27 +8,37 @@ interface IHyperbaseIdentityRegistry {
     // ERRORS
     ////////////////
 
-    // Only the identity owner can call this function
+	/**
+	 * @dev Only the identity owner can call this function
+	 */
     error OnlyIdentity();
 	
   	////////////////
     // EVENTS
     ////////////////
 
-	// A new identity has been added to the registry
+	/**
+	 * @dev A new identity has been added to the registry
+	 */
     event IdentityRegistered(address indexed holderAddress, uint256 indexed identity);
 	
-	// An indentity has been removed from the registry
+	/**
+	 * @dev An indentity has been removed from the registry
+	 */
     event IdentityRemoved(address indexed holderAddress, uint256 indexed identity);
 	
-	// An identities country has been updated
+	/**
+	 * @dev An identities country has been updated
+	 */
     event CountryUpdated(address indexed holderAddress, uint16 indexed country);
 
   	////////////////
     // CONSTANTS
     ////////////////
 
-    // Enumerated list of countries
+	/**
+	 * @dev Enumerated list of countries
+	 */
 	enum Country {
 		Afghanistan,
 		Albania,
@@ -232,13 +242,8 @@ interface IHyperbaseIdentityRegistry {
     // CREATE | DELETE IDENTITY
     //////////////////////////////////////////////
 
-    // Adds a new idenity to the identity registry. This is neccesary for idenity-based interactions in the protocol. 
-    function newIdentity(address account, uint16 country) external returns (uint256);
-
-    // Deletes an identity by its underlying address
+    function newIdentity(address account, uint16 country) external returns (uint256 identityId_);
     function deleteIdentityByAddress(address account) external;
-
-    // Deletes an idenity from the registry
     function deleteIdentity(uint256 identity) external;
     
     //////////////////////////////////////////////
@@ -252,16 +257,9 @@ interface IHyperbaseIdentityRegistry {
     // SETTERS
     //////////////////////////////////////////////
 
-	// Returns the fields associated with an identity by the underlying address
 	function getIdentityByAddress(address account) external view returns (bool, uint16);
-        
-    // Returns all fields for an identity 
 	function getIdentity(uint256 identity) external view returns (bool, uint16);
-
-    // Returns the country of an identity
     function getCountry(uint256 identity) external view returns (uint16);
-    
-	// Returns the country associated with an identity by the underlying address
     function getCountryByAddress(address account) external view returns (uint16);
 
 }

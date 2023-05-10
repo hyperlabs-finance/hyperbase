@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.6;
 
+// Inherits
 import '.././Interface/IHyperbaseIdentityRegistry.sol';
 
 contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
@@ -9,25 +10,32 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
   	////////////////
     // STATE
     ////////////////
-
-    // Identity fields
+    
+    /**
+     * @dev Identity fields.
+     */
     struct Identity {
 		bool exists;
         Country country;
-		// #TODO any more pertinant fields to include? Hashed name for example? Multiple accounts on an identity?
     }
 
-	// Array of identities
+    /**
+     * @dev Array of all identities.
+     */
 	Identity[] public _identities;
 
-    // Mapping from address to identity index
+    /**
+     * @dev Mapping from address to identity index.
+     */
     mapping(address => uint256) public _identitiesByAddress;
 
   	////////////////
     // MODIFIERS
     ////////////////
 
-    // Ensure that only the identity owner can call this function
+    /**
+     * @dev Ensures that only the identity owner can call this function.
+     */
 	modifier onlyIdentity(
 		uint256 identity
 	) {
@@ -40,22 +48,30 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
     // CREATE | DELETE IDENTITY
     //////////////////////////////////////////////
 
-    // Register new identity
+    /**
+     * @dev Adds a new idenity to the identity registry. This is neccesary for identity-based interactions in the protocol.
+     * @param account The account that for which the new identity is being is being added.
+     * @param country The country of the new identity.
+     */
     function newIdentity(
 		address account, 
         uint16 country
     )
         public
-		returns (uint256)
+		returns (uint256 identityId_)
     {
 		// Create identity
-		uint256 identityId = _createIdentity(account, country);
+		identityId_ = _createIdentity(account, country);
 
         // Event
-	    emit IdentityRegistered(account, identityId);
+	    emit IdentityRegistered(account, identityId_);
     }
 
-	// Internal function to create new identity
+    /**
+     * @dev Internal function to create new identity.
+     * @param account The account that for which the new identity is being is being added.
+     * @param country The country of the new identity.
+     */
 	function _createIdentity(
 		address account,
         uint16 country
@@ -79,7 +95,10 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
         return _identities.length - 1;
 	}
 
-    // Removes an identity from the registry by address
+    /**
+     * @dev Removes an identity from the registry by address.
+     * @param account The address of the identity.
+     */
     function deleteIdentityByAddress(
         address account
     )
@@ -88,7 +107,10 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 		deleteIdentity(_identitiesByAddress[account]);
     }
 
-    // Removes an identity from the registry
+    /**
+     * @dev Removes an identity from the registry.
+     * @param identity The identity ID to remove.
+     */
     function deleteIdentity(
         uint256 identity
     )
@@ -106,7 +128,11 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
     // SETTERS
     //////////////////////////////////////////////
 
-    // Updates the country associated with an identity
+    /**
+     * @dev Updates the country associated with an identity.
+     * @param identity The identity ID to update the country on.
+     * @param country The new country for the account.
+     */
     function setCountry(
         uint256 identity, 
         uint16 country
@@ -125,7 +151,10 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
     // GETTERS
     //////////////////////////////////////////////
 
-	// Returns the fields associated with an identity by the underlying address
+    /**
+     * @dev Returns the fields associated with an identity by the underlying address.
+     * @param account The address of the account to return the identity on.
+     */
 	function getIdentityByAddress(
 		address account
 	)
@@ -136,7 +165,10 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 		return getIdentity(_identitiesByAddress[account]);
 	}
 
-	// Returns all fields for an identity 
+    /**
+     * @dev Returns all fields for an identity.
+     * @param identity The ID of the identity.
+     */
 	function getIdentity(
 		uint256 identity
 	)
@@ -147,7 +179,10 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 		return (_identities[identity].exists, uint16(_identities[identity].country));
 	}
 
-	// Returns the country associated with an identity by the underlying address
+    /**
+     * @dev Returns the country associated with an identity by the underlying address
+     * @param account The account to return the country of.
+     */
     function getCountryByAddress(
         address account
     )
@@ -158,7 +193,10 @@ contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 		return uint16(getCountry(_identitiesByAddress[account])); 
     }
 
-	// Returns the country of an identity
+    /**
+     * @dev Returns the country of an identity
+     * @param identity The ID of the identity to return the country of.
+     */
 	function getCountry(
 		uint256 identity
 	)
