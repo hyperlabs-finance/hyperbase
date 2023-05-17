@@ -47,7 +47,7 @@ In order to execute a transaction from a Hyperbase user account:
 4. The relay wraps the transaction request within another transaction (meta transaction) and submits the transaction to the identity account contract.
 5. The identity account contract unwraps the meta-transaction and executes the transaction requested by the user.
 
-### User Account Access
+### Account Access
 
 To access a user account the user inputs a personal account subdomain: “alice.smith.hypersurf”
 	a. If the user has an account and key:
@@ -63,7 +63,7 @@ To access a user account the user inputs a personal account subdomain: “alice.
 
 ## Digital Identities
 
-As a platform for regulated interactions, identity plays a fundamental role in the Hypersurface protocol. Identity is crucial in allowing (1) users to engage with one another online with confidence, (2) creating binding legal agreements between parties and (3) enabling smart contracts to validate credentials, thereby automating the process of compliance.
+As a platform for regulated interactions identity plays a fundamental role in the Hypersurface protocol. Identity is crucial in allowing (1) users to engage with one another online with confidence, (2) creating binding legal agreements between parties and (3) enabling smart contracts to validate credentials, thereby automating the process of compliance.
 
 Verifiable digital identities create a powerful resource that enables users to engage broadly across investment, ownership, and governance on the blockchain. Identities are persistent, meaning they may only need to be verified once to open an entire network of opportunities. In this sense, an identity account can be thought of as a digital ID card. Not only is it valid across opportunities but with further standardisation it may be used across the blockchain ecosystem.
 
