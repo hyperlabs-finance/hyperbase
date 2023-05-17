@@ -6,6 +6,18 @@ pragma solidity ^0.8.6;
 import 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import '../Interface/IHyperbaseVerifiersRegistry.sol';
 
+/**
+
+    HyperbaseVerifiersRegistry records which accounts are "verifiers" and are trusted
+    by users to provide high-risk claims that are used in credential-based interactions.
+    These may include KYC agents or regulated broker dealers. The verifiers registry is
+    seperated from the other contracts in the protocol so that it may be owned and controlled
+    by a token curated registry. This design choice has been made (but yet to be implemented)
+    in order to further decentralised control in the Hypersurface protocol, in order to ensure
+    that no one group, not even Hypersurface, gets final say in terms of key decisions.  
+
+ */
+
 contract HyperbaseVerifiersRegistry is IHyperbaseVerifiersRegistry, Ownable {
 	
   	////////////////
@@ -13,7 +25,7 @@ contract HyperbaseVerifiersRegistry is IHyperbaseVerifiersRegistry, Ownable {
     ////////////////
     
     /**
-     * @dev Array of all trusted _verifiers i.e. kyc agents, etc/
+     * @dev Array of all trusted _verifiers i.e. kyc agents, etc.
      */
     address[] public _verifiers;
 

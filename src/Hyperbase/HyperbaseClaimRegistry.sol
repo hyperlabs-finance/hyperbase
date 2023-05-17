@@ -9,6 +9,15 @@ import '../Interface/IHyperbaseClaimRegistry.sol';
 // Interfaces
 import '../Interface/IHyperbaseVerifiersRegistry.sol';
 
+/**
+
+    HyperbaseClaimRegistry is the central registry where users of the hypersurface protocol can add 
+    claims about themselves and others. These claims are then check in credital-based interactions.
+    Examples of such claims may be that an user is an accredited investor or that the are a citizen
+    of a particular jurisdiction.
+
+ */
+
 contract HyperbaseClaimRegistry is IHyperbaseClaimRegistry, Ownable {
 
   	////////////////

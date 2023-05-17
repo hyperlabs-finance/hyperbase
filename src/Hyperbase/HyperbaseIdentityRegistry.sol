@@ -5,6 +5,15 @@ pragma solidity ^0.8.6;
 // Inherits
 import '.././Interface/IHyperbaseIdentityRegistry.sol';
 
+/**
+
+    HyperbaseIdentityRegistry records key fields about user identities on-chain. This 
+    will soon be updated so as to obfuscate the underlying accounts allowing claims to 
+    be recorded on-chain without readily revealing information about the user the 
+    pertain to.
+
+ */
+
 contract HyperbaseIdentityRegistry is IHyperbaseIdentityRegistry {
 	
   	////////////////
