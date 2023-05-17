@@ -4,17 +4,17 @@
 
 ## What is Hyperbase?
 
-Hyperbase is a lightweight multi-factor smart contract that enables users to hold digital assets and participate in identity driven interactions. Instead of expecting newcomers to educate themselves on security best practices Hyperbase is secure by design. High-risk decisions are safeguarded by multi-factor authentication, either requiring the approval of multiple devices or further the approval of multiple team members. 
+Hyperbase is a lightweight multi-factor smart contract that enables users to hold digital assets and participate in identity-driven interactions. Instead of expecting newcomers to educate themselves on security best practices Hyperbase is secure by design. High-risk decisions are safeguarded by multi-factor authentication, either requiring the approval of multiple devices or further the approval of multiple team members. 
 
 Associated with Hyperbase accounts is the Hyperbase identity suite, a series of tools for creating digital identities. Using claims, signed attestations asserting that an account has some attribute or attributes, users can build digital identities that allow them to automate their compliance checks and participate in credential-based interactions opening the door to a world of regulated assets.
 
 ## Hyperbase
 
-Blockchain technology today is much like the first generation of the web. Even in 2022, blockchain applications make little provision for non-technical users. This design philosophy is perhaps best summarised as “By developers, for developers”. While the technical infrastructure is established and capable of supporting use at scale a relatively small number of key usability issues present a far greater barrier to adoption than the underlying technology. 
+Blockchain technology today is much like the first generation of the web. While the technical infrastructure is established and capable of supporting use at scale, a relatively small number of key usability issues present a far greater barrier to adoption than the underlying technology. Even in 2022, blockchain applications make little provision for non-technical users. This design philosophy is perhaps best summarised as “By developers, for developers”.
 
-It is our conclusion that for blockchain-based applications to achieve mainstream commercial success, the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level rather than a necessary pastime for anyone who wishes to participate.
+It is our conclusion that for blockchain-based applications to achieve mainstream commercial success the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level rather than a necessary pastime for anyone who wishes to participate.
 
-Furthermore, in the current paradigm, accounts are made and disposed of at will. Privacy may be of great importance, however, the throwaway nature of blockchain accounts has prevented the space from evolving. Without being able to make any meaningful assumptions about the person behind the account it has proven impractical to create user-oriented experiences. 
+Furthermore, in the current paradigm accounts are made and disposed of at will. Privacy may be of great importance, however, the throwaway nature of blockchain accounts has prevented the space from evolving. Without being able to make any meaningful assumptions about the person behind the account it has proven impractical to create user-oriented experiences. 
 
 Our solution is Hyperbase, a smart contract account and digital identity and credentialling solution. Hyperbase accounts provide drastic improvements over current designs by abstracting all the riskiest, most intimidating, and otherwise inconvenient aspects out of the user's experience. Importantly, Hyperbase does so while maintaining the full benefits of decentralisation. This is essential as it ensures that assets belong to their owner and and no one else. 
 
