@@ -4,7 +4,9 @@
 
 ## What is Hyperbase?
 
-Hyperbase is a lightweight multi-factor smart contract account that enables users to hold digital assets and participate in identity driven interactions. Instead of expecting newcomers to educate themselves on security best practices, Hyperbase is secure by design. High-risk decisions are safeguarded by multi-factor authentication, either requiring the approval of multiple devices or further, requiring the approval of multiple team members. 
+Hyperbase is a lightweight multi-factor smart contract that enables users to hold digital assets and participate in identity driven interactions. Instead of expecting newcomers to educate themselves on security best practices Hyperbase is secure by design. High-risk decisions are safeguarded by multi-factor authentication, either requiring the approval of multiple devices or further the approval of multiple team members. 
+
+Associated with Hyperbase accounts is the Hyperbase identity suite, a series of tools for creating digital identities. Using claims, signed attestations asserting that an account has some attribute or attributes, users can build digital identities that allow them to automate their compliance checks and participate in credential-based interactions opening the door to a world of regulated assets.
 
 ## Hyperbase
 
