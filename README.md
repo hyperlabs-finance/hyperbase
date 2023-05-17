@@ -6,37 +6,33 @@
 
 Hyperbase is a lightweight multi-factor smart contract that enables users to hold digital assets and participate in identity-driven interactions. Instead of expecting newcomers to educate themselves on security best practices Hyperbase is secure by design. High-risk decisions are safeguarded by multi-factor authentication, either requiring the approval of multiple devices or further the approval of multiple team members. 
 
-Associated with Hyperbase accounts is the Hyperbase identity suite, a series of tools for creating digital identities. Using claims, signed attestations asserting that an account has some attribute or attributes, users can build digital identities that allow them to automate their compliance checks and participate in credential-based interactions opening the door to a world of regulated assets.
+Associated with Hyperbase accounts is the Hyperbase identity suite, a series of tools for creating digital identities. Using claims, signed attestations asserting that an account has some attribute or attributes, users can build digital identities that allow them to automate compliance checks and participate in credential-based interactions.
 
 ## Hyperbase
 
-Blockchain technology today is much like the first generation of the web. While the technical infrastructure is established and capable of supporting use at scale, a relatively small number of key usability issues present a far greater barrier to adoption than the underlying technology. Even in 2022, blockchain applications make little provision for non-technical users. This design philosophy is perhaps best summarised as “By developers, for developers”.
+Blockchain technology today is much like the first generation of the web. While the technical infrastructure is established and capable of supporting use at scale a relatively small number of key usability issues present a far greater barrier to adoption than the underlying technology. Even in 2022, blockchain applications make little provision for non-technical users. This design philosophy is perhaps best summarised as “By developers, for developers”.
 
-It is our conclusion that for blockchain-based applications to achieve mainstream commercial success the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level rather than a necessary pastime for anyone who wishes to participate.
+It is our conclusion that for blockchain-based applications to achieve mainstream commercial success the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level, rather than a necessary pastime for anyone who wishes to participate.
 
-Furthermore, in the current paradigm accounts are made and disposed of at will. Privacy may be of great importance, however, the throwaway nature of blockchain accounts has prevented the space from evolving. Without being able to make any meaningful assumptions about the person behind the account it has proven impractical to create user-oriented experiences. 
+Furthermore, in the current paradigm accounts are made and disposed of at will. Privacy may be of great importance, however, the throwaway nature of blockchain accounts has prevented the space from evolving. Without being able to make any meaningful assumptions about the person behind the account it has proven impractical to create user-oriented experiences or support registered assets. 
 
-Our solution is Hyperbase, a smart contract account and digital identity and credentialling solution. Hyperbase accounts provide drastic improvements over current designs by abstracting all the riskiest, most intimidating, and otherwise inconvenient aspects out of the user's experience. Importantly, Hyperbase does so while maintaining the full benefits of decentralisation. This is essential as it ensures that assets belong to their owner and and no one else. 
+Our solution is Hyperbase, a smart contract account and digital identity and credentialling solution. Hyperbase accounts provide drastic improvements over current designs by abstracting all the riskiest, most intimidating, and otherwise inconvenient aspects out of the user experience. Importantly, Hyperbase does so while maintaining the full benefits of decentralisation. This is essential as it ensures that assets belong to their owner and no one else. 
 
 #### Subdomain Identifiers
 
-Users have come to expect accounts to be identified by names, usernames, handles, or email addresses, all of which provide identification in a simple, comprehensible format. Rather than being identified by a 42-character public key, Hyperbase accounts and objects are identified by subdomains, giving users a clear, comprehensible handle for interactions.
+Users have come to expect accounts to be identified by names, usernames, handles or email addresses, all of which provide identification in a simple, comprehensible format. Rather than being identified by a 42-character public key, Hyperbase accounts and objects are identified by subdomains, giving users a clear, comprehensible handle for interactions.
 
 #### Smart Contract Account
 
-At the core of Hyperbase is a smart contract wallet, that functions as a proxy account contract whereby users may execute transactions. Associated with the account is a key-value store that records an arbitrary number of keys. Any one of these keys may execute transactions from the account following the necessary number of approvals.
+At the core of Hyperbase is a smart contract wallet that functions as a proxy account contract whereby users may execute transactions. Associated with the account is a key-value store that records an arbitrary number of keys. Any one of these keys may execute transactions from the account following the necessary number of approvals.
 
-Multi-signature wallets (“multi-sigs”) are a widely used class of smart contract wallets. The benefits of multi-signature wallets are that they both remove single-point failures and create a multi-factor authentication process that is ideal for high-risk or institutional transactions. Users may configure an optional number of approvals by operation type in order to execute transactions.
+The benefit of requiring multiple-signatures wallets is that it both reduces the risk of single-point failures and creates a multi-factor authentication process that is ideal for higher-risk transactions. Users may configure an optional number of approvals by operation type to execute transactions.
 
 #### Local Keys
 
-While many blockchain enthusiasts are fervent believers in the importance of self-custody, it is important to recognise that for the average user, simplicity is a greater priority than control.
+While many blockchain enthusiasts are fervent believers in the importance of self-custody, it is important to recognise that for the average user simplicity is a greater priority than control. If we do not acknowledge this reality when desiging blockchain applications we will end up driving users into the arms of centralised exchanges. In order to create a simple, accessible experience while preserving self-custody and ensuring that users have direct control over their assets, Hypersurface uses numerous disposable context-specific key pairs. These key pairs are, in effect, standard externally owned account (“EOA”) wallets.
 
-{If we do not acknowledge this fact then we will continue to drive users into the hands of cex}
-
-In order to create a simple, accessible experience while preserving self-custody and ensuring that users have direct control over their assets, Hypersurface uses numerous disposable context-specific key pairs. These key pairs are, in effect, standard externally owned account (“EOA”) wallets.
-
-However, they never actually become known to the user as they are simply used to sign transactions locally. As such, these EOA accounts never hold any funds, which are instead held by the user's core identity account. When a user attempts to access their identity account on a new device, a new key pair is created and stored locally on the user's device. Permission is then requested on the identity account from the existing keys to add the new key. This request must then be approved, typically from another device. Once the key is approved it is added to the account.
+Where they differ from is that they never actually become known to the user as they are simply used to sign transactions locally. As such, these EOA accounts never hold any funds, which are instead held by the user's core identity account. When a user attempts to access their identity account on a new device, a new key pair is created and stored locally on the user's device. Permission is then requested on the identity account from the existing keys to add the new key. This request must then be approved, typically from another device. Once the key is approved it is added to the account.
 
 #### Meta Transactions
 
