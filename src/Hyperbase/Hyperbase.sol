@@ -326,6 +326,9 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     // CHECKS
     //////////////////////////////////////////////
 
+    /**
+     * @dev Returns boolean as to if the transaction has been approved.
+     */
     function checkIsApproved(
         uint256 txHash
     )
@@ -342,6 +345,9 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     // GETTERS
     //////////////////////////////////////////////
 
+    /**
+     * @dev Returns The maximum number of keys that can be added to the account.
+     */
     function getMaxKeyCount()
         public
         view
@@ -350,7 +356,9 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         return MAX_KEY_COUNT;
     }
     
-    // Returns number of `_approvalsByTransaction` of a 
+    /**
+     * @dev Returns number of `_approvalsByTransaction` for a transaction.
+     */
     function getApprovalCount(
         uint256 txHash
     )
@@ -362,8 +370,10 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
             if (_approvalsByTransaction[_transactionsByHash[txHash]][_keys[i].key])
                 approvalCount++;
     }
-
-    // Returns array with `_key` addresses that confirmed 
+    
+    /**
+     * @dev Returns array with `_key` addresses that confirmed.
+     */
     function getApprovals(
         uint256 txHash
     )
@@ -388,7 +398,9 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     // SETTERS
     //////////////////////////////////////////////
 
-    // Allows to change the number of _required _approvalsByTransaction. Transaction has to be sent by This.
+    /**
+     * @dev Changes the number of required approvals to execute a transaction.
+     */
     function setRequirement(
         uint8 required
     )

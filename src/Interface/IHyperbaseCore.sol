@@ -33,4 +33,33 @@ interface IHyperbaseCore {
      */
     error NoTransactionArrayParity();
 
+  	////////////////
+    // EVENTS
+    ////////////////
+
+    /**
+     * @dev A transaction has been submitted.
+     */
+    event Submitted(uint256 indexed executionId, address[] indexed to, uint256[] indexed value, bytes[] data);
+    
+    /**
+     * @dev An approval has been added to a transaction.
+     */
+    event Approved(address indexed sender, uint indexed transactionId, bool approved);
+
+    /**
+     * @dev A transaction has been executed.
+     */
+    event Executed(uint256 indexed executionId, address[] indexed to, uint256[] indexed value, bytes[] data);
+    
+    /**
+     * @dev A transaction has been cancelled.
+     */
+    event Cancelled(uint256 indexed executionId, address[] indexed to, uint256[] indexed value, bytes[] data);
+    
+    /**
+     * @dev An executed transactoin has failed.
+     */
+    event ExecutionFailure(uint indexed transactionId);
+
 }

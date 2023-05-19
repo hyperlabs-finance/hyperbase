@@ -7,7 +7,7 @@ import 'openzeppelin-contracts/contracts/utils/Timers.sol';
 import 'openzeppelin-contracts/contracts/utils/Address.sol';
 import 'openzeppelin-contracts/contracts/utils/math/SafeCast.sol';
 
-contract Hyperbase is IHyperbaseCore {  
+contract HyperbaseCore is IHyperbaseCore {  
 
   	////////////////
     // USING
@@ -29,6 +29,17 @@ contract Hyperbase is IHyperbaseCore {
     * @dev Expiry period in block time.
     */
     uint256 EXPIRY_PERIOD;
+
+    /**
+    * @dev Executions status of the transaction.
+    */
+    enum Status {
+        PENDING,
+        CANCELLED,
+        SUBMITTED,
+        EXECUTED,
+        FAILED
+    }
 
   	////////////////
     // STATE
@@ -120,7 +131,9 @@ contract Hyperbase is IHyperbaseCore {
     // TRANSACTIONS
     //////////////////////////////////////////////
 
-    // Internal transaction submission function
+    /**
+     * @dev Internal transaction submission function.
+     */
     function _submit(
         address[] memory targets,
         uint256[] memory values,
@@ -146,7 +159,8 @@ contract Hyperbase is IHyperbaseCore {
 
             _transactions[_transactionsByHash[txHash]].status = Status.PENDING;
 
-        } // Else create a new tx 
+        } 
+        // Else create a new tx 
         else {
             
             // Create and push to transaction array
@@ -168,10 +182,11 @@ contract Hyperbase is IHyperbaseCore {
 
         // Add the approval from the sender
         _approvalsByTransaction[_transactions.length][_msgSender()] = true;   
-
     }
 
-    // Internal execute function 
+    /**
+     * @dev Internal transaction executions function.
+     */
     function _execute(
         uint256 txHash, /* txHash */
         address[] memory targets,
@@ -194,7 +209,9 @@ contract Hyperbase is IHyperbaseCore {
         return txHash;
     }
 
-    // Cancel a tx
+    /**
+     * @dev Internal cancel a transaction function.
+     */ 
     function _cancel(
         uint256 txHash,
         address[] memory targets,
@@ -222,6 +239,9 @@ contract Hyperbase is IHyperbaseCore {
     // GETTERS
     //////////////////////////////////////////////
 
+    /**
+     * @dev Returns the expirey period for a submitted transaction.
+     */ 
     function getExpiryPeriod()
         public
         view
@@ -230,6 +250,9 @@ contract Hyperbase is IHyperbaseCore {
         return EXPIRY_PERIOD;
     }
     
+    /**
+     * @dev Returns the transaction hash for a transaction.
+     */ 
     function getTransactionHash(
         address[] memory targets,
         uint256[] memory values,
@@ -241,8 +264,10 @@ contract Hyperbase is IHyperbaseCore {
     {
         return uint256(keccak256(abi.encode(targets, values, calldatas)));
     }
-
-    // Returns total number of `_transactions` after filers are applied.
+    
+    /**
+     * @dev Returns total number of transactions after filters are applied.
+     */ 
     function getTransactionCount(
         bool pending,
         bool executed
@@ -256,7 +281,9 @@ contract Hyperbase is IHyperbaseCore {
                 approvalCount++;
     }
 
-    // Returns list of transaction IDs in defined range.
+    /**
+     * @dev Returns list of transaction IDs in defined range.
+     */ 
     function getTransactionIds(
         uint256 from,
         uint256 to,
