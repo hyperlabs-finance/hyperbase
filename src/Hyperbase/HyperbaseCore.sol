@@ -135,6 +135,7 @@ contract HyperbaseCore is IHyperbaseCore {
      * @dev Internal transaction submission function.
      */
     function _submit(
+        address submitter,
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas
@@ -181,7 +182,7 @@ contract HyperbaseCore is IHyperbaseCore {
         _transactionsByStatus[Status.PENDING].push(_transactionsByHash[txHash]);
 
         // Add the approval from the sender
-        _approvalsByTransaction[_transactions.length][_msgSender()] = true;   
+        _approvalsByTransaction[_transactions.length][submitter] = true;   
     }
 
     /**
