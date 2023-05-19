@@ -1,6 +1,6 @@
 # Hyperbase
 
-**Welcome to Hyperbase: a lightweight multi-factor smart contract account + digital identity and credentialing solution.**
+**Welcome to Hyperbase: a secure, lightweight multi-factor smart contract account.**
 
 ## What is Hyperbase?
 
