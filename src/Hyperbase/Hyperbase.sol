@@ -11,6 +11,8 @@ import 'openzeppelin-contracts/contracts/utils/Address.sol';
 import 'openzeppelin-contracts/contracts/utils/math/SafeCast.sol';
 
 // #TODO: EXPIRED TRANSACTIONS
+// #TODO: remove permission levels, needless complexity
+// #TODO: sign multiple transactions in one
 
 contract Hyperbase is IHyperbase, ERC2771Context {  
 
