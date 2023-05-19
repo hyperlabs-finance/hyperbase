@@ -12,7 +12,7 @@
     },
     {
       "inputs": [],
-      "name": "VerifierAlreadyExists",
+      "name": "VerifierExists",
       "type": "error"
     },
     {
@@ -447,7 +447,7 @@
               "text": " @dev Trusted Verifier already exists"
             },
             "errorSelector": "fdb61377",
-            "name": "VerifierAlreadyExists",
+            "name": "VerifierExists",
             "nameLocation": "865:21:7",
             "parameters": {
               "id": 1477,

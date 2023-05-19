@@ -5037,7 +5037,7 @@
                 }
               ]
             },
-            "name": "notNull",
+            "name": "keyZeroAddress",
             "nameLocation": "4307:7:11",
             "parameters": {
               "id": 2459,
@@ -6287,7 +6287,7 @@
                 "kind": "modifierInvocation",
                 "modifierName": {
                   "id": 2545,
-                  "name": "notNull",
+                  "name": "keyZeroAddress",
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 2471,
                   "src": "5346:7:11"

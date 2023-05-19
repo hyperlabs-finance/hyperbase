@@ -3,6 +3,49 @@
 pragma solidity ^0.8.6;
 
 interface IHyperbase {
+
+  	////////////////
+    // ERRORS
+    ////////////////
+
+    /**
+    * @dev Only this contract can call these functions.
+    */
+    error OnlyThis()
+        
+    /**
+    * @dev Key has already been added to the account.
+    */
+    error KeyExists();
+
+    /**
+    * @dev Key has not been added to the account.
+    */
+    error KeyDoesNotExists();
+
+    /**
+    * @dev Key has not approved the transaction.
+    */
+    error KeyNotApproved();
+
+    /**
+    * @dev Key has already approved the transaction.
+    */
+    error KeyApproved();
+
+    /**
+    * @dev Key is zero address.
+    */
+    error KeyZeroAddress();
+
+    /**
+    * @dev Key does not have permission for the transaction.
+    */
+    error KeyDoesNotHavePermission();
+
+
+
+
     
     // Determines what types of tx the key can submit/approve 
     enum Permission {

@@ -8,7 +8,7 @@ This enables a lot of interesting use cases, including atomic purchases using to
 
 Furthermore, since contracts are required to implement these hooks in order to receive tokens, _no tokens can get stuck in a contract that is unaware of the ERC777 protocol_, as has happened countless times when using ERC20s.
 
-== What If I Already Use ERC20?
+== What If I  Use ERC20?
 
 The standard has you covered! The ERC777 standard is *backwards compatible with ERC20*, meaning you can interact with these tokens as if they were ERC20, using the standard functions, while still getting all of the niceties, including send hooks. See the https://eips.ethereum.org/EIPS/eip-777#backward-compatibility[EIP's Backwards Compatibility section] to learn more.
 
