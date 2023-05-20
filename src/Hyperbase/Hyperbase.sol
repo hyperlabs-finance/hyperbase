@@ -31,12 +31,22 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     /**
     * @dev All keys on the approvalCount.
     */
-    Key[] public _keys;
+    address[] public _keys;
 
     /**
     * @dev Mapping from address to key index.
     */
     mapping(address => uint256) _keysByAddress;
+
+    /**
+    * @dev Mapping from key address to exists status.
+    */
+    mapping(address => bool) _keyExistsByAddress;
+
+    /**
+    * @dev Mapping from transaction index to adress to approval status.
+    */
+    mapping(uint256 => mapping(address => bool)) private _approvalsByTransaction;
 
   	////////////////
     // CONSTRUCTOR
@@ -72,7 +82,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     modifier keyNotExist(
 		address key
 	) {
-        if (_keys[_keysByAddress[key]].exists)
+        if (_keyExistsByAddress[key])
             revert KeyExists();
         _;
     }
@@ -83,7 +93,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     modifier keyExists(
 		address key
 	) {
-        if (!_keys[_keysByAddress[key]].exists)
+        if (!_keyExistsByAddress[key])
             revert KeyDoesNotExists();
         _;
     }
@@ -127,15 +137,10 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
      * @dev Ensure the update results in keys on the account that are valid.
      */
     modifier keyRequirementsValid(
-		uint8 keyCount
+		uint8 required
 	) {
-        if (
-            MAX_KEY_COUNT <= keyCount &&
-            keyCount <= REQUIRED &&
-            REQUIRED == 0 &&
-            keyCount == 0
-        )
-            revert InkeyRequirementsValid();
+        if (MAX_KEY_COUNT <= _keys.length || _keys.length <= required || required == 0 || _keys.length == 0)
+            revert KeyRequirementInvalid();
         _;
     }
 
@@ -153,11 +158,15 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         onlyThis
         keyNotExist(key)
         keyNotNull(key)
-        keyRequirementsValid(_keys.length + 1)
+        keyRequirementsValid(uint8(_keys.length + 1))
     {
         // Push to transaction array
         _keys.push(key);
+
+        // Key exists
+        _keyExistsByAddress[key] = true;
         
+        // Event
         emit KeyAdded(key);
     }
 
@@ -180,6 +189,9 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     
         // Delete key
         delete _keys[_keysByAddress[key]];
+
+        // Key exists
+        _keyExistsByAddress[key] = false;
 
         // Event
         emit KeyRemoved(key);
@@ -212,24 +224,21 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
      * @dev Approve a transaction with controlling key, intended as multi-factor auth rather than dedicated multisig.  
      */
     function approve(
-        uint256 txHash, 
-        bool approved
+        uint256 txHash
     )
         public
         keyExists(_msgSender())
-        keyHasRequiredPermission(_msgSender())
         keyNotApproved(txHash, _msgSender())
-        transactionNotExecuted(txHash)
-        returns (uint256)
+        transactionPending(txHash)
     {
         // Set approved
-        _approvalsByTransaction[_transactionsByHash[txHash]][_msgSender()] = approved;   
+        _approvalsByTransaction[_transactionsByHash[txHash]][_msgSender()] = true;   
 
         // Event
-        emit Approved(_msgSender(), txHash, approved);
+        emit Approved(_msgSender(), txHash);
 
         // Call execute on the tx
-        return execute(_transactions[txHash].targets, _transactions[txHash].values, _transactions[txHash].calldatas);
+        execute(txHash);
     }
 
     /**
@@ -241,13 +250,28 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         public
         keyExists(_msgSender())
         keyApproved(txHash, _msgSender())
-        transactionNotExecuted(txHash)
+        transactionPending(txHash)
     {
         // Revoke approval
         _approvalsByTransaction[_transactionsByHash[txHash]][_msgSender()] = false;
 
         // Event 
-        emit Revocation(_msgSender(), txHash);
+        emit Revoked(_msgSender(), txHash);
+    }
+
+    /**
+     * @dev Resets the transaction approvals when calling a repeat tx.
+     */
+    function _resetApproval(
+        uint256 txHash
+    )
+        internal
+    {
+        // If tx already exists
+        if (0 < _transactionsByHash[txHash])
+            // Iterate through all keys on the account and set as false
+            for (uint8 i = 0; i < _keys.length; i++)
+                _approvalsByTransaction[_transactionsByHash[txHash]][_keys[i]] = false;       
     }
 
     //////////////////////////////////////////////
@@ -263,36 +287,21 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         bytes[] memory calldatas
     )
 		public
-        keyHasRequiredPermission(_msgSender())
-		returns (uint256)
+		returns (uint256 txHash)
 	{
         // Submit the tx
-        _submit(_msgSender(), targets, values, calldatas);
+        txHash = _submit(targets, values, calldatas);
+
+        // Reset the tx
+        _resetApproval(txHash);
+
+        // Approve the tx from the sender
+        approve(txHash);
 
         // Event
-        emit ExecutionRequested(txHash, targets, values, calldatas);
+        emit Submitted(txHash, targets, values, calldatas);
 
         // Call execute on the tx
-        execute(targets, values, calldatas);
-
-        return _transactions.length;
-    }
-
-    /**
-     * @dev Wrapper to execute the transaction by the transaction fields.
-     */
-    function execute(
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas
-    )
-        public
-        returns (uint256)
-    {
-        // Get the by hash
-        uint256 txHash = getTransactionHash(targets, values, calldatas);
-
-        // Execute
         execute(txHash);
     }
 
@@ -307,15 +316,15 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         virtual
         keyExists(_msgSender())
         keyApproved(txHash, _msgSender())
-        returns (uint256)
     {        
+        // If approved, execute
         if (REQUIRED <= getApprovalCount(txHash)) {
 
             // Execute the TX
-            _execute(txHash, targets, values, calldatas);
+            _execute(txHash);
                 
             // Event
-            emit Executed(txHash, targets, values, calldatas);
+            emit Executed(txHash, _transactions[txHash].targets, _transactions[txHash].values, _transactions[txHash].calldatas);
         }
     }
 
@@ -330,6 +339,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         uint256 txHash
     )
         public
+        view
         returns (bool)
     {
         if (REQUIRED <= getApprovalCount(txHash))
@@ -364,7 +374,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         returns (uint8 approvalCount)
     {
         for (uint256 i = 0; i < _keys.length; i++)
-            if (_approvalsByTransaction[_transactionsByHash[txHash]][_keys[i].key])
+            if (_approvalsByTransaction[_transactionsByHash[txHash]][_keys[i]])
                 approvalCount++;
     }
     
@@ -381,8 +391,8 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         address[] memory _approvalsByTransactionTemp = new address[](_keys.length);
         uint8 approvalCount = 0;
         for (uint256 i = 0; i < _keys.length; i++) {
-            if (_approvalsByTransaction[_transactionsByHash[txHash]][_keys[i].key]) {
-                _approvalsByTransactionTemp[approvalCount] = _keys[i].key;
+            if (_approvalsByTransaction[_transactionsByHash[txHash]][_keys[i]]) {
+                _approvalsByTransactionTemp[approvalCount] = _keys[i];
                 approvalCount++;
             }
         }
@@ -403,9 +413,10 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     )
         public
         onlyThis
-        keyRequirementsValid(_keys.length, required)
+        keyRequirementsValid(required)
     {
         REQUIRED = required;
+
         emit RequirementChange(required);
     }
 

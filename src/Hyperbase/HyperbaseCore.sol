@@ -60,37 +60,21 @@ contract HyperbaseCore is IHyperbaseCore {
     /**
     * @dev All _transactions from.
     */
-	Transaction[] private _transactions;
+	Transaction[] internal _transactions;
 
     /**
-    * @dev Mapping from transaction index to adress to approval status.
+    * @dev Mapping from transaction has to transactionId.
     */
-    mapping(uint256 => mapping(address => bool)) public _approvalsByTransaction;
-
-    /**
-    * @dev Mapping from id to _transactions index.
-    */
-    mapping(uint256 => uint256) _transactionsByHash;
+    mapping(uint256 => uint256) internal _transactionsByHash;
 
     /**
     * @dev Mapping from status to _transaction index.
     */
-    mapping(Status => uint256[]) _transactionsByStatus;
+    mapping(Status => uint256[]) internal _transactionsByStatus;
 
   	////////////////
     // MODIFIERS
     ////////////////
-     
-    /**
-     * @dev Ensure that the transaction does not already exist.
-     */
-    modifier transactionExists(
-		uint256 txHash
-	) {
-        if (uint256(_transactions[_transactionsByHash[txHash]].required) == 0) 
-            revert TransactionExists();
-        _;
-    }
 
     /**
      * @dev Ensure that the transaction has PENDING status.
@@ -135,7 +119,6 @@ contract HyperbaseCore is IHyperbaseCore {
      * @dev Internal transaction submission function.
      */
     function _submit(
-        address submitter,
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas
@@ -181,22 +164,22 @@ contract HyperbaseCore is IHyperbaseCore {
         // Add tx to tx by status
         _transactionsByStatus[Status.PENDING].push(_transactionsByHash[txHash]);
 
-        // Add the approval from the sender
-        _approvalsByTransaction[_transactions.length][submitter] = true;   
+        return txHash; 
     }
 
     /**
      * @dev Internal transaction executions function.
      */
     function _execute(
-        uint256 txHash, /* txHash */
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas
+        uint256 txHash
     )
         internal
         transactionPending(txHash)
     {
+        address[] memory targets = _transactions[txHash].targets;
+        uint256[] memory values = _transactions[txHash].values;
+        bytes[] memory calldatas = _transactions[txHash].calldatas;
+
         // Execute the tx
         string memory errorMessage = "Hyperbase: call reverted without message";
         for (uint256 i = 0; i < targets.length; ++i) {
@@ -206,8 +189,6 @@ contract HyperbaseCore is IHyperbaseCore {
     
         // Update the transaction status
         _transactions[_transactionsByHash[txHash]].status = Status.EXECUTED;
-
-        return txHash;
     }
 
     /**
@@ -224,14 +205,11 @@ contract HyperbaseCore is IHyperbaseCore {
         transactionPending(txHash)
         returns (uint256)
     {
-        // Get tx status
-        Status status = _transactions[_transactionsByHash[txHash]].status;
-
         // Update the transaction status
         _transactions[_transactionsByHash[txHash]].status = Status.CANCELLED;
 
         // Event
-        emit Canceled(txHash, targets, values, calldatas);
+        emit Cancelled(txHash, targets, values, calldatas);
 
         return _transactionsByHash[txHash];
     }

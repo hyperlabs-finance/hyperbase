@@ -28,10 +28,10 @@
         1846
       ],
       "Vm": [
-        12140
+        12300
       ],
       "VmSafe": [
-        11751
+        11855
       ]
     },
     "nodeType": "SourceUnit",
@@ -84,7 +84,7 @@
         "file": "./Vm.sol",
         "nameLocation": "-1:-1:-1",
         "scope": 1859,
-        "sourceUnit": 12141,
+        "sourceUnit": 12301,
         "symbolAliases": [
           {
             "foreign": {
@@ -92,7 +92,7 @@
               "name": "Vm",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "referencedDeclaration": 12140,
+              "referencedDeclaration": 12300,
               "src": "118:2:1",
               "typeDescriptions": {}
             },
@@ -104,7 +104,7 @@
               "name": "VmSafe",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "referencedDeclaration": 11751,
+              "referencedDeclaration": 11855,
               "src": "122:6:1",
               "typeDescriptions": {}
             },
@@ -729,7 +729,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_Vm_$12140",
+              "typeIdentifier": "t_contract$_Vm_$12300",
               "typeString": "contract Vm"
             },
             "typeName": {
@@ -739,13 +739,13 @@
                 "id": 1834,
                 "name": "Vm",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 12140,
+                "referencedDeclaration": 12300,
                 "src": "1194:2:1"
               },
-              "referencedDeclaration": 12140,
+              "referencedDeclaration": 12300,
               "src": "1194:2:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Vm_$12140",
+                "typeIdentifier": "t_contract$_Vm_$12300",
                 "typeString": "contract Vm"
               }
             },
@@ -775,10 +775,10 @@
                 "name": "Vm",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
-                "referencedDeclaration": 12140,
+                "referencedDeclaration": 12300,
                 "src": "1220:2:1",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_type$_t_contract$_Vm_$12140_$",
+                  "typeIdentifier": "t_type$_t_contract$_Vm_$12300_$",
                   "typeString": "type(contract Vm)"
                 }
               },
@@ -793,7 +793,7 @@
               "src": "1220:14:1",
               "tryCall": false,
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Vm_$12140",
+                "typeIdentifier": "t_contract$_Vm_$12300",
                 "typeString": "contract Vm"
               }
             },
@@ -941,7 +941,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_VmSafe_$11751",
+              "typeIdentifier": "t_contract$_VmSafe_$11855",
               "typeString": "contract VmSafe"
             },
             "typeName": {
@@ -951,13 +951,13 @@
                 "id": 1852,
                 "name": "VmSafe",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 11751,
+                "referencedDeclaration": 11855,
                 "src": "1561:6:1"
               },
-              "referencedDeclaration": 11751,
+              "referencedDeclaration": 11855,
               "src": "1561:6:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_VmSafe_$11751",
+                "typeIdentifier": "t_contract$_VmSafe_$11855",
                 "typeString": "contract VmSafe"
               }
             },
@@ -987,10 +987,10 @@
                 "name": "VmSafe",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
-                "referencedDeclaration": 11751,
+                "referencedDeclaration": 11855,
                 "src": "1595:6:1",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_type$_t_contract$_VmSafe_$11751_$",
+                  "typeIdentifier": "t_type$_t_contract$_VmSafe_$11855_$",
                   "typeString": "type(contract VmSafe)"
                 }
               },
@@ -1005,7 +1005,7 @@
               "src": "1595:18:1",
               "tryCall": false,
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_VmSafe_$11751",
+                "typeIdentifier": "t_contract$_VmSafe_$11855",
                 "typeString": "contract VmSafe"
               }
             },

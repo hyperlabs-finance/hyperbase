@@ -1,12 +1,12 @@
 {
   "abi": [],
   "bytecode": {
-    "object": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220c9bcc59ff959425697d3b719660cc1a32b9bbb5f0a99299f9c48e54aacd6490364736f6c634300080e0033",
+    "object": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220d461cfd0597c9e222e670ff992d80b3f2ea173eb9539a1775d462a668a4f51fc64736f6c634300080e0033",
     "sourceMap": "830:5374:7:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;830:5374:7;;;;;;;;;;;;;;;;;",
     "linkReferences": {}
   },
   "deployedBytecode": {
-    "object": "0x73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220c9bcc59ff959425697d3b719660cc1a32b9bbb5f0a99299f9c48e54aacd6490364736f6c634300080e0033",
+    "object": "0x73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220d461cfd0597c9e222e670ff992d80b3f2ea173eb9539a1775d462a668a4f51fc64736f6c634300080e0033",
     "sourceMap": "830:5374:7:-:0;;;;;;;;",
     "linkReferences": {}
   },
@@ -16,7 +16,7 @@
     "id": 7113,
     "exportedSymbols": {
       "VmSafe": [
-        11751
+        11855
       ],
       "stdJson": [
         7112
@@ -56,7 +56,7 @@
         "file": "./Vm.sol",
         "nameLocation": "-1:-1:-1",
         "scope": 7113,
-        "sourceUnit": 12141,
+        "sourceUnit": 12301,
         "symbolAliases": [
           {
             "foreign": {
@@ -64,7 +64,7 @@
               "name": "VmSafe",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
-              "referencedDeclaration": 11751,
+              "referencedDeclaration": 11855,
               "src": "108:6:7",
               "typeDescriptions": {}
             },
@@ -90,7 +90,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_VmSafe_$11751",
+              "typeIdentifier": "t_contract$_VmSafe_$11855",
               "typeString": "contract VmSafe"
             },
             "typeName": {
@@ -100,13 +100,13 @@
                 "id": 6542,
                 "name": "VmSafe",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 11751,
+                "referencedDeclaration": 11855,
                 "src": "852:6:7"
               },
-              "referencedDeclaration": 11751,
+              "referencedDeclaration": 11855,
               "src": "852:6:7",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_VmSafe_$11751",
+                "typeIdentifier": "t_contract$_VmSafe_$11855",
                 "typeString": "contract VmSafe"
               }
             },
@@ -308,10 +308,10 @@
                 "name": "VmSafe",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
-                "referencedDeclaration": 11751,
+                "referencedDeclaration": 11855,
                 "src": "881:6:7",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_type$_t_contract$_VmSafe_$11751_$",
+                  "typeIdentifier": "t_type$_t_contract$_VmSafe_$11855_$",
                   "typeString": "type(contract VmSafe)"
                 }
               },
@@ -326,7 +326,7 @@
               "src": "881:63:7",
               "tryCall": false,
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_VmSafe_$11751",
+                "typeIdentifier": "t_contract$_VmSafe_$11855",
                 "typeString": "contract VmSafe"
               }
             },
@@ -388,7 +388,7 @@
                         "referencedDeclaration": 6558,
                         "src": "1062:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -399,7 +399,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJson",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11400,
+                      "referencedDeclaration": 11492,
                       "src": "1062:12:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_pure$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bytes_memory_ptr_$",
@@ -589,7 +589,7 @@
                         "referencedDeclaration": 6558,
                         "src": "1199:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -600,7 +600,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11416,
+                      "referencedDeclaration": 11508,
                       "src": "1199:16:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_uint256_$",
@@ -790,7 +790,7 @@
                         "referencedDeclaration": 6558,
                         "src": "1354:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -801,7 +801,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonUintArray",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11426,
+                      "referencedDeclaration": 11518,
                       "src": "1354:21:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_array$_t_uint256_$dyn_memory_ptr_$",
@@ -1000,7 +1000,7 @@
                         "referencedDeclaration": 6558,
                         "src": "1498:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -1011,7 +1011,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonInt",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11435,
+                      "referencedDeclaration": 11527,
                       "src": "1498:15:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_int256_$",
@@ -1201,7 +1201,7 @@
                         "referencedDeclaration": 6558,
                         "src": "1650:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -1212,7 +1212,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonIntArray",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11445,
+                      "referencedDeclaration": 11537,
                       "src": "1650:20:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_array$_t_int256_$dyn_memory_ptr_$",
@@ -1411,7 +1411,7 @@
                         "referencedDeclaration": 6558,
                         "src": "1798:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -1422,7 +1422,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonBytes32",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11530,
+                      "referencedDeclaration": 11622,
                       "src": "1798:19:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bytes32_$",
@@ -1612,7 +1612,7 @@
                         "referencedDeclaration": 6558,
                         "src": "1959:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -1623,7 +1623,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonBytes32Array",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11540,
+                      "referencedDeclaration": 11632,
                       "src": "1959:24:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -1822,7 +1822,7 @@
                         "referencedDeclaration": 6558,
                         "src": "2116:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -1833,7 +1833,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonString",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11492,
+                      "referencedDeclaration": 11584,
                       "src": "2116:18:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -2023,7 +2023,7 @@
                         "referencedDeclaration": 6558,
                         "src": "2274:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -2034,7 +2034,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonStringArray",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11502,
+                      "referencedDeclaration": 11594,
                       "src": "2274:23:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_array$_t_string_memory_ptr_$dyn_memory_ptr_$",
@@ -2233,7 +2233,7 @@
                         "referencedDeclaration": 6558,
                         "src": "2425:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -2244,7 +2244,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonAddress",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11473,
+                      "referencedDeclaration": 11565,
                       "src": "2425:19:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_address_$",
@@ -2435,7 +2435,7 @@
                         "referencedDeclaration": 6558,
                         "src": "2586:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -2446,7 +2446,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonAddressArray",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11483,
+                      "referencedDeclaration": 11575,
                       "src": "2586:24:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -2646,7 +2646,7 @@
                         "referencedDeclaration": 6558,
                         "src": "2732:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -2657,7 +2657,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonBool",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11454,
+                      "referencedDeclaration": 11546,
                       "src": "2732:16:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bool_$",
@@ -2847,7 +2847,7 @@
                         "referencedDeclaration": 6558,
                         "src": "2884:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -2858,7 +2858,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonBoolArray",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11464,
+                      "referencedDeclaration": 11556,
                       "src": "2884:21:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_array$_t_bool_$dyn_memory_ptr_$",
@@ -3057,7 +3057,7 @@
                         "referencedDeclaration": 6558,
                         "src": "3036:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -3068,7 +3068,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonBytes",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11511,
+                      "referencedDeclaration": 11603,
                       "src": "3036:17:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bytes_memory_ptr_$",
@@ -3258,7 +3258,7 @@
                         "referencedDeclaration": 6558,
                         "src": "3191:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -3269,7 +3269,7 @@
                       "lValueRequested": false,
                       "memberName": "parseJsonBytesArray",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11521,
+                      "referencedDeclaration": 11613,
                       "src": "3191:22:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr_$",
@@ -3484,7 +3484,7 @@
                         "referencedDeclaration": 6558,
                         "src": "3360:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -3495,7 +3495,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeBool",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11551,
+                      "referencedDeclaration": 11643,
                       "src": "3360:16:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_bool_$returns$_t_string_memory_ptr_$",
@@ -3728,7 +3728,7 @@
                         "referencedDeclaration": 6558,
                         "src": "3562:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -3739,7 +3739,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeBool",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11629,
+                      "referencedDeclaration": 11721,
                       "src": "3562:16:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_array$_t_bool_$dyn_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -3981,7 +3981,7 @@
                         "referencedDeclaration": 6558,
                         "src": "3738:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -3992,7 +3992,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11562,
+                      "referencedDeclaration": 11654,
                       "src": "3738:16:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_uint256_$returns$_t_string_memory_ptr_$",
@@ -4225,7 +4225,7 @@
                         "referencedDeclaration": 6558,
                         "src": "3943:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -4236,7 +4236,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11641,
+                      "referencedDeclaration": 11733,
                       "src": "3943:16:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_array$_t_uint256_$dyn_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -4478,7 +4478,7 @@
                         "referencedDeclaration": 6558,
                         "src": "4118:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -4489,7 +4489,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeInt",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11573,
+                      "referencedDeclaration": 11665,
                       "src": "4118:15:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_int256_$returns$_t_string_memory_ptr_$",
@@ -4722,7 +4722,7 @@
                         "referencedDeclaration": 6558,
                         "src": "4321:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -4733,7 +4733,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeInt",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11653,
+                      "referencedDeclaration": 11745,
                       "src": "4321:15:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_array$_t_int256_$dyn_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -4975,7 +4975,7 @@
                         "referencedDeclaration": 6558,
                         "src": "4496:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -4986,7 +4986,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeAddress",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11584,
+                      "referencedDeclaration": 11676,
                       "src": "4496:19:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_address_$returns$_t_string_memory_ptr_$",
@@ -5220,7 +5220,7 @@
                         "referencedDeclaration": 6558,
                         "src": "4704:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -5231,7 +5231,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeAddress",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11665,
+                      "referencedDeclaration": 11757,
                       "src": "4704:19:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_array$_t_address_$dyn_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -5474,7 +5474,7 @@
                         "referencedDeclaration": 6558,
                         "src": "4883:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -5485,7 +5485,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeBytes32",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11595,
+                      "referencedDeclaration": 11687,
                       "src": "4883:19:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_bytes32_$returns$_t_string_memory_ptr_$",
@@ -5718,7 +5718,7 @@
                         "referencedDeclaration": 6558,
                         "src": "5091:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -5729,7 +5729,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeBytes32",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11677,
+                      "referencedDeclaration": 11769,
                       "src": "5091:19:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_array$_t_bytes32_$dyn_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -5971,7 +5971,7 @@
                         "referencedDeclaration": 6558,
                         "src": "5275:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -5982,7 +5982,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeBytes",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11617,
+                      "referencedDeclaration": 11709,
                       "src": "5275:17:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_bytes_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -6215,7 +6215,7 @@
                         "referencedDeclaration": 6558,
                         "src": "5479:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -6226,7 +6226,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeBytes",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11701,
+                      "referencedDeclaration": 11793,
                       "src": "5479:17:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -6468,7 +6468,7 @@
                         "referencedDeclaration": 6558,
                         "src": "5682:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -6479,7 +6479,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeString",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11606,
+                      "referencedDeclaration": 11698,
                       "src": "5682:18:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -6712,7 +6712,7 @@
                         "referencedDeclaration": 6558,
                         "src": "5888:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -6723,7 +6723,7 @@
                       "lValueRequested": false,
                       "memberName": "serializeString",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11689,
+                      "referencedDeclaration": 11781,
                       "src": "5888:18:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_array$_t_string_memory_ptr_$dyn_memory_ptr_$returns$_t_string_memory_ptr_$",
@@ -6949,7 +6949,7 @@
                         "referencedDeclaration": 6558,
                         "src": "6017:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -6960,7 +6960,7 @@
                       "lValueRequested": false,
                       "memberName": "writeJson",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11708,
+                      "referencedDeclaration": 11800,
                       "src": "6017:12:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",
@@ -7137,7 +7137,7 @@
                         "referencedDeclaration": 6558,
                         "src": "6158:2:7",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_VmSafe_$11751",
+                          "typeIdentifier": "t_contract$_VmSafe_$11855",
                           "typeString": "contract VmSafe"
                         }
                       },
@@ -7148,7 +7148,7 @@
                       "lValueRequested": false,
                       "memberName": "writeJson",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11717,
+                      "referencedDeclaration": 11809,
                       "src": "6158:12:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$__$",

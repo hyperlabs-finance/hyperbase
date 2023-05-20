@@ -1,104 +1,39 @@
 {
   "abi": [
     {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "transactionId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "approved",
-          "type": "bool"
-        }
-      ],
-      "name": "Approved",
-      "type": "event"
+      "inputs": [],
+      "name": "KeyApproved",
+      "type": "error"
     },
     {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "executionId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address[]",
-          "name": "to",
-          "type": "address[]"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint256[]",
-          "name": "value",
-          "type": "uint256[]"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes[]",
-          "name": "data",
-          "type": "bytes[]"
-        }
-      ],
-      "name": "Executed",
-      "type": "event"
+      "inputs": [],
+      "name": "KeyDoesNotExists",
+      "type": "error"
     },
     {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "transactionId",
-          "type": "uint256"
-        }
-      ],
-      "name": "ExecutionFailure",
-      "type": "event"
+      "inputs": [],
+      "name": "KeyExists",
+      "type": "error"
     },
     {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "executionId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address[]",
-          "name": "to",
-          "type": "address[]"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint256[]",
-          "name": "value",
-          "type": "uint256[]"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes[]",
-          "name": "data",
-          "type": "bytes[]"
-        }
-      ],
-      "name": "ExecutionRequested",
-      "type": "event"
+      "inputs": [],
+      "name": "KeyNotApproved",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "KeyRequirementInvalid",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "KeyZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OnlyThis",
+      "type": "error"
     },
     {
       "anonymous": false,
@@ -108,12 +43,6 @@
           "internalType": "address",
           "name": "key",
           "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint8",
-          "name": "permission",
-          "type": "uint8"
         }
       ],
       "name": "KeyAdded",
@@ -127,12 +56,6 @@
           "internalType": "address",
           "name": "key",
           "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint8",
-          "name": "permission",
-          "type": "uint8"
         }
       ],
       "name": "KeyRemoved",
@@ -143,37 +66,12 @@
       "inputs": [
         {
           "indexed": false,
-          "internalType": "uint8",
-          "name": "permission",
-          "type": "uint8"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint8",
-          "name": "required",
-          "type": "uint8"
-        }
-      ],
-      "name": "RequirementChange",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        },
-        {
-          "indexed": true,
           "internalType": "uint256",
-          "name": "transactionId",
+          "name": "requirement",
           "type": "uint256"
         }
       ],
-      "name": "Revocation",
+      "name": "RequirementChange",
       "type": "event"
     }
   ],
@@ -190,19 +88,19 @@
   "methodIdentifiers": {},
   "ast": {
     "absolutePath": "/mnt/c/Users/44783/Desktop/PROJECTS/hypersurface/hyperbase/src/Interface/IHyperbase.sol",
-    "id": 4732,
+    "id": 32138,
     "exportedSymbols": {
       "IHyperbase": [
-        4731
+        32137
       ]
     },
     "nodeType": "SourceUnit",
-    "src": "39:1029:14",
+    "src": "39:1290:31",
     "nodes": [
       {
-        "id": 4658,
+        "id": 32100,
         "nodeType": "PragmaDirective",
-        "src": "39:23:14",
+        "src": "39:23:31",
         "literals": [
           "solidity",
           "^",
@@ -211,108 +109,178 @@
         ]
       },
       {
-        "id": 4731,
+        "id": 32137,
         "nodeType": "ContractDefinition",
-        "src": "66:1002:14",
+        "src": "66:1263:31",
         "nodes": [
           {
-            "id": 4662,
-            "nodeType": "EnumDefinition",
-            "src": "164:77:14",
-            "canonicalName": "IHyperbase.Permission",
-            "members": [
-              {
-                "id": 4659,
-                "name": "CLAIM",
-                "nameLocation": "191:5:14",
-                "nodeType": "EnumValue",
-                "src": "191:5:14"
-              },
-              {
-                "id": 4660,
-                "name": "ACTION",
-                "nameLocation": "207:6:14",
-                "nodeType": "EnumValue",
-                "src": "207:6:14"
-              },
-              {
-                "id": 4661,
-                "name": "MANAGEMENT",
-                "nameLocation": "224:10:14",
-                "nodeType": "EnumValue",
-                "src": "224:10:14"
-              }
-            ],
-            "name": "Permission",
-            "nameLocation": "169:10:14"
+            "id": 32103,
+            "nodeType": "ErrorDefinition",
+            "src": "230:17:31",
+            "documentation": {
+              "id": 32101,
+              "nodeType": "StructuredDocumentation",
+              "src": "156:68:31",
+              "text": " @dev Only this contract can call these functions."
+            },
+            "errorSelector": "f8d8ab0e",
+            "name": "OnlyThis",
+            "nameLocation": "236:8:31",
+            "parameters": {
+              "id": 32102,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "244:2:31"
+            }
           },
           {
-            "id": 4668,
-            "nodeType": "EnumDefinition",
-            "src": "278:113:14",
-            "canonicalName": "IHyperbase.Status",
-            "members": [
-              {
-                "id": 4663,
-                "name": "PENDING",
-                "nameLocation": "301:7:14",
-                "nodeType": "EnumValue",
-                "src": "301:7:14"
-              },
-              {
-                "id": 4664,
-                "name": "CANCELLED",
-                "nameLocation": "319:9:14",
-                "nodeType": "EnumValue",
-                "src": "319:9:14"
-              },
-              {
-                "id": 4665,
-                "name": "SUBMITTED",
-                "nameLocation": "339:9:14",
-                "nodeType": "EnumValue",
-                "src": "339:9:14"
-              },
-              {
-                "id": 4666,
-                "name": "EXECUTED",
-                "nameLocation": "359:8:14",
-                "nodeType": "EnumValue",
-                "src": "359:8:14"
-              },
-              {
-                "id": 4667,
-                "name": "FAILED",
-                "nameLocation": "378:6:14",
-                "nodeType": "EnumValue",
-                "src": "378:6:14"
-              }
-            ],
-            "name": "Status",
-            "nameLocation": "283:6:14"
+            "id": 32106,
+            "nodeType": "ErrorDefinition",
+            "src": "335:18:31",
+            "documentation": {
+              "id": 32104,
+              "nodeType": "StructuredDocumentation",
+              "src": "263:66:31",
+              "text": " @dev Key has already been added to the account."
+            },
+            "errorSelector": "adb8cab5",
+            "name": "KeyExists",
+            "nameLocation": "341:9:31",
+            "parameters": {
+              "id": 32105,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "350:2:31"
+            }
           },
           {
-            "id": 4674,
+            "id": 32109,
+            "nodeType": "ErrorDefinition",
+            "src": "429:25:31",
+            "documentation": {
+              "id": 32107,
+              "nodeType": "StructuredDocumentation",
+              "src": "361:62:31",
+              "text": " @dev Key has not been added to the account."
+            },
+            "errorSelector": "492f94d5",
+            "name": "KeyDoesNotExists",
+            "nameLocation": "435:16:31",
+            "parameters": {
+              "id": 32108,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "451:2:31"
+            }
+          },
+          {
+            "id": 32112,
+            "nodeType": "ErrorDefinition",
+            "src": "529:23:31",
+            "documentation": {
+              "id": 32110,
+              "nodeType": "StructuredDocumentation",
+              "src": "462:61:31",
+              "text": " @dev Key has not approved the transaction."
+            },
+            "errorSelector": "2bdada0a",
+            "name": "KeyNotApproved",
+            "nameLocation": "535:14:31",
+            "parameters": {
+              "id": 32111,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "549:2:31"
+            }
+          },
+          {
+            "id": 32115,
+            "nodeType": "ErrorDefinition",
+            "src": "631:20:31",
+            "documentation": {
+              "id": 32113,
+              "nodeType": "StructuredDocumentation",
+              "src": "560:65:31",
+              "text": " @dev Key has already approved the transaction."
+            },
+            "errorSelector": "bfc00463",
+            "name": "KeyApproved",
+            "nameLocation": "637:11:31",
+            "parameters": {
+              "id": 32114,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "648:2:31"
+            }
+          },
+          {
+            "id": 32118,
+            "nodeType": "ErrorDefinition",
+            "src": "709:23:31",
+            "documentation": {
+              "id": 32116,
+              "nodeType": "StructuredDocumentation",
+              "src": "659:44:31",
+              "text": " @dev Key is zero address."
+            },
+            "errorSelector": "2adfb711",
+            "name": "KeyZeroAddress",
+            "nameLocation": "715:14:31",
+            "parameters": {
+              "id": 32117,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "729:2:31"
+            }
+          },
+          {
+            "id": 32121,
+            "nodeType": "ErrorDefinition",
+            "src": "852:30:31",
+            "documentation": {
+              "id": 32119,
+              "nodeType": "StructuredDocumentation",
+              "src": "740:106:31",
+              "text": " @dev Change would result in inadequate keys on the account, either too many or too few."
+            },
+            "errorSelector": "4c47aba1",
+            "name": "KeyRequirementInvalid",
+            "nameLocation": "858:21:31",
+            "parameters": {
+              "id": 32120,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "879:2:31"
+            }
+          },
+          {
+            "id": 32126,
             "nodeType": "EventDefinition",
-            "src": "403:62:14",
+            "src": "1016:36:31",
             "anonymous": false,
-            "eventSelector": "381960c0a2d5db99f9117b781d9cf21af515e0ea220e679efaf2c8f6dcf48730",
+            "documentation": {
+              "id": 32122,
+              "nodeType": "StructuredDocumentation",
+              "src": "950:60:31",
+              "text": " @dev A key has been added to the account."
+            },
+            "eventSelector": "654abba5d3170185ed25c9b41f7d2094db3643986b05e9e9cab37028b800ad7e",
             "name": "KeyAdded",
-            "nameLocation": "409:8:14",
+            "nameLocation": "1022:8:31",
             "parameters": {
-              "id": 4673,
+              "id": 32125,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4670,
+                  "id": 32124,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "key",
-                  "nameLocation": "434:3:14",
+                  "nameLocation": "1047:3:31",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4674,
-                  "src": "418:19:14",
+                  "scope": 32126,
+                  "src": "1031:19:31",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -320,10 +288,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4669,
+                    "id": 32123,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "418:7:14",
+                    "src": "1031:7:31",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -331,61 +299,39 @@
                     }
                   },
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4672,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "permission",
-                  "nameLocation": "453:10:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4674,
-                  "src": "439:24:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint8",
-                    "typeString": "uint8"
-                  },
-                  "typeName": {
-                    "id": 4671,
-                    "name": "uint8",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "439:5:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint8",
-                      "typeString": "uint8"
-                    }
-                  },
-                  "visibility": "internal"
                 }
               ],
-              "src": "417:47:14"
+              "src": "1030:21:31"
             }
           },
           {
-            "id": 4680,
+            "id": 32131,
             "nodeType": "EventDefinition",
-            "src": "471:64:14",
+            "src": "1134:38:31",
             "anonymous": false,
-            "eventSelector": "7747561ec5ce7bfb29eaa2ce403a6c18ce3721a800bb197d03c17c0782187223",
+            "documentation": {
+              "id": 32127,
+              "nodeType": "StructuredDocumentation",
+              "src": "1064:64:31",
+              "text": " @dev A key has been removed from the account."
+            },
+            "eventSelector": "d2b2d9609b634ccc6f93482de9f8431ec6222fed4fa3cfca3b2a7e1a96a924ae",
             "name": "KeyRemoved",
-            "nameLocation": "477:10:14",
+            "nameLocation": "1140:10:31",
             "parameters": {
-              "id": 4679,
+              "id": 32130,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4676,
+                  "id": 32129,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "key",
-                  "nameLocation": "504:3:14",
+                  "nameLocation": "1167:3:31",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4680,
-                  "src": "488:19:14",
+                  "scope": 32131,
+                  "src": "1151:19:31",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -393,10 +339,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4675,
+                    "id": 32128,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "488:7:14",
+                    "src": "1151:7:31",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -404,639 +350,59 @@
                     }
                   },
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4678,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "permission",
-                  "nameLocation": "523:10:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4680,
-                  "src": "509:24:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint8",
-                    "typeString": "uint8"
-                  },
-                  "typeName": {
-                    "id": 4677,
-                    "name": "uint8",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "509:5:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint8",
-                      "typeString": "uint8"
-                    }
-                  },
-                  "visibility": "internal"
                 }
               ],
-              "src": "487:47:14"
+              "src": "1150:21:31"
             }
           },
           {
-            "id": 4693,
+            "id": 32136,
             "nodeType": "EventDefinition",
-            "src": "543:115:14",
+            "src": "1279:45:31",
             "anonymous": false,
-            "eventSelector": "3462b54350b31c008d5df03e53992710cd1b3f528bd765d7151548ecd2317e25",
-            "name": "ExecutionRequested",
-            "nameLocation": "549:18:14",
-            "parameters": {
-              "id": 4692,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 4682,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "executionId",
-                  "nameLocation": "584:11:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4693,
-                  "src": "568:27:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 4681,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "568:7:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4685,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "to",
-                  "nameLocation": "615:2:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4693,
-                  "src": "597:20:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
-                    "typeString": "address[]"
-                  },
-                  "typeName": {
-                    "baseType": {
-                      "id": 4683,
-                      "name": "address",
-                      "nodeType": "ElementaryTypeName",
-                      "src": "597:7:14",
-                      "stateMutability": "nonpayable",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_address",
-                        "typeString": "address"
-                      }
-                    },
-                    "id": 4684,
-                    "nodeType": "ArrayTypeName",
-                    "src": "597:9:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
-                      "typeString": "address[]"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4688,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "value",
-                  "nameLocation": "637:5:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4693,
-                  "src": "619:23:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
-                    "typeString": "uint256[]"
-                  },
-                  "typeName": {
-                    "baseType": {
-                      "id": 4686,
-                      "name": "uint256",
-                      "nodeType": "ElementaryTypeName",
-                      "src": "619:7:14",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_uint256",
-                        "typeString": "uint256"
-                      }
-                    },
-                    "id": 4687,
-                    "nodeType": "ArrayTypeName",
-                    "src": "619:9:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
-                      "typeString": "uint256[]"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4691,
-                  "indexed": false,
-                  "mutability": "mutable",
-                  "name": "data",
-                  "nameLocation": "652:4:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4693,
-                  "src": "644:12:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_bytes_memory_ptr_$dyn_memory_ptr",
-                    "typeString": "bytes[]"
-                  },
-                  "typeName": {
-                    "baseType": {
-                      "id": 4689,
-                      "name": "bytes",
-                      "nodeType": "ElementaryTypeName",
-                      "src": "644:5:14",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_bytes_storage_ptr",
-                        "typeString": "bytes"
-                      }
-                    },
-                    "id": 4690,
-                    "nodeType": "ArrayTypeName",
-                    "src": "644:7:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
-                      "typeString": "bytes[]"
-                    }
-                  },
-                  "visibility": "internal"
-                }
-              ],
-              "src": "567:90:14"
-            }
-          },
-          {
-            "id": 4701,
-            "nodeType": "EventDefinition",
-            "src": "664:82:14",
-            "anonymous": false,
-            "eventSelector": "55bf8b20f6ce8264ee592ab0316f1f8e3e12dc12906329e903d3b020ccec7aea",
-            "name": "Approved",
-            "nameLocation": "670:8:14",
-            "parameters": {
-              "id": 4700,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 4695,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "sender",
-                  "nameLocation": "695:6:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4701,
-                  "src": "679:22:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 4694,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "679:7:14",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4697,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "transactionId",
-                  "nameLocation": "716:13:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4701,
-                  "src": "703:26:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 4696,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "703:4:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4699,
-                  "indexed": false,
-                  "mutability": "mutable",
-                  "name": "approved",
-                  "nameLocation": "736:8:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4701,
-                  "src": "731:13:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bool",
-                    "typeString": "bool"
-                  },
-                  "typeName": {
-                    "id": 4698,
-                    "name": "bool",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "731:4:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bool",
-                      "typeString": "bool"
-                    }
-                  },
-                  "visibility": "internal"
-                }
-              ],
-              "src": "678:67:14"
-            }
-          },
-          {
-            "id": 4714,
-            "nodeType": "EventDefinition",
-            "src": "752:105:14",
-            "anonymous": false,
-            "eventSelector": "606df15328702c746e4b85fd70292add0c21224b4362c4e1f190d4d010dbd24a",
-            "name": "Executed",
-            "nameLocation": "758:8:14",
-            "parameters": {
-              "id": 4713,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 4703,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "executionId",
-                  "nameLocation": "783:11:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4714,
-                  "src": "767:27:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 4702,
-                    "name": "uint256",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "767:7:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4706,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "to",
-                  "nameLocation": "814:2:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4714,
-                  "src": "796:20:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
-                    "typeString": "address[]"
-                  },
-                  "typeName": {
-                    "baseType": {
-                      "id": 4704,
-                      "name": "address",
-                      "nodeType": "ElementaryTypeName",
-                      "src": "796:7:14",
-                      "stateMutability": "nonpayable",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_address",
-                        "typeString": "address"
-                      }
-                    },
-                    "id": 4705,
-                    "nodeType": "ArrayTypeName",
-                    "src": "796:9:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
-                      "typeString": "address[]"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4709,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "value",
-                  "nameLocation": "836:5:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4714,
-                  "src": "818:23:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
-                    "typeString": "uint256[]"
-                  },
-                  "typeName": {
-                    "baseType": {
-                      "id": 4707,
-                      "name": "uint256",
-                      "nodeType": "ElementaryTypeName",
-                      "src": "818:7:14",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_uint256",
-                        "typeString": "uint256"
-                      }
-                    },
-                    "id": 4708,
-                    "nodeType": "ArrayTypeName",
-                    "src": "818:9:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
-                      "typeString": "uint256[]"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4712,
-                  "indexed": false,
-                  "mutability": "mutable",
-                  "name": "data",
-                  "nameLocation": "851:4:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4714,
-                  "src": "843:12:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_array$_t_bytes_memory_ptr_$dyn_memory_ptr",
-                    "typeString": "bytes[]"
-                  },
-                  "typeName": {
-                    "baseType": {
-                      "id": 4710,
-                      "name": "bytes",
-                      "nodeType": "ElementaryTypeName",
-                      "src": "843:5:14",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_bytes_storage_ptr",
-                        "typeString": "bytes"
-                      }
-                    },
-                    "id": 4711,
-                    "nodeType": "ArrayTypeName",
-                    "src": "843:7:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
-                      "typeString": "bytes[]"
-                    }
-                  },
-                  "visibility": "internal"
-                }
-              ],
-              "src": "766:90:14"
-            }
-          },
-          {
-            "id": 4718,
-            "nodeType": "EventDefinition",
-            "src": "863:51:14",
-            "anonymous": false,
-            "eventSelector": "526441bb6c1aba3c9a4a6ca1d6545da9c2333c8c48343ef398eb858d72b79236",
-            "name": "ExecutionFailure",
-            "nameLocation": "869:16:14",
-            "parameters": {
-              "id": 4717,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 4716,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "transactionId",
-                  "nameLocation": "899:13:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4718,
-                  "src": "886:26:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 4715,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "886:4:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "visibility": "internal"
-                }
-              ],
-              "src": "885:28:14"
-            }
-          },
-          {
-            "id": 4724,
-            "nodeType": "EventDefinition",
-            "src": "922:69:14",
-            "anonymous": false,
-            "eventSelector": "f6a317157440607f36269043eb55f1287a5a19ba2216afeab88cd46cbcfb88e9",
-            "name": "Revocation",
-            "nameLocation": "928:10:14",
-            "parameters": {
-              "id": 4723,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 4720,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "sender",
-                  "nameLocation": "955:6:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4724,
-                  "src": "939:22:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 4719,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "939:7:14",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4722,
-                  "indexed": true,
-                  "mutability": "mutable",
-                  "name": "transactionId",
-                  "nameLocation": "976:13:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4724,
-                  "src": "963:26:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 4721,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "963:4:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "visibility": "internal"
-                }
-              ],
-              "src": "938:52:14"
-            }
-          },
-          {
-            "id": 4730,
-            "nodeType": "EventDefinition",
-            "src": "1005:58:14",
-            "anonymous": false,
-            "eventSelector": "c6b1effd76b8a1f78192f9a8008e7de4d75668d034c316b07cfc5e57a89f1201",
+            "documentation": {
+              "id": 32132,
+              "nodeType": "StructuredDocumentation",
+              "src": "1180:93:31",
+              "text": " @dev The amount of sigs require to execute a transaction has been updated."
+            },
+            "eventSelector": "a3f1ee9126a074d9326c682f561767f710e927faa811f7a99829d49dc421797a",
             "name": "RequirementChange",
-            "nameLocation": "1011:17:14",
+            "nameLocation": "1285:17:31",
             "parameters": {
-              "id": 4729,
+              "id": 32135,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4726,
+                  "id": 32134,
                   "indexed": false,
                   "mutability": "mutable",
-                  "name": "permission",
-                  "nameLocation": "1035:10:14",
+                  "name": "requirement",
+                  "nameLocation": "1311:11:31",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4730,
-                  "src": "1029:16:14",
+                  "scope": 32136,
+                  "src": "1303:19:31",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_uint8",
-                    "typeString": "uint8"
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4725,
-                    "name": "uint8",
+                    "id": 32133,
+                    "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1029:5:14",
+                    "src": "1303:7:31",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_uint8",
-                      "typeString": "uint8"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 4728,
-                  "indexed": false,
-                  "mutability": "mutable",
-                  "name": "required",
-                  "nameLocation": "1053:8:14",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 4730,
-                  "src": "1047:14:14",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint8",
-                    "typeString": "uint8"
-                  },
-                  "typeName": {
-                    "id": 4727,
-                    "name": "uint8",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1047:5:14",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint8",
-                      "typeString": "uint8"
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "1028:34:14"
+              "src": "1302:21:31"
             }
           }
         ],
@@ -1047,15 +413,23 @@
         "contractKind": "interface",
         "fullyImplemented": true,
         "linearizedBaseContracts": [
-          4731
+          32137
         ],
         "name": "IHyperbase",
-        "nameLocation": "76:10:14",
-        "scope": 4732,
-        "usedErrors": []
+        "nameLocation": "76:10:31",
+        "scope": 32138,
+        "usedErrors": [
+          32103,
+          32106,
+          32109,
+          32112,
+          32115,
+          32118,
+          32121
+        ]
       }
     ],
     "license": "GPL-3.0"
   },
-  "id": 14
+  "id": 31
 }

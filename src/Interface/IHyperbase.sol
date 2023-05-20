@@ -39,9 +39,9 @@ interface IHyperbase {
     error KeyZeroAddress();
 
     /**
-    * @dev Key does not have permission for the transaction.
+    * @dev Change would result in inadequate keys on the account, either too many or too few.
     */
-    error KeyDoesNotHavePermission();
+    error KeyRequirementInvalid();
 
   	////////////////
     // EVENTS
@@ -50,11 +50,16 @@ interface IHyperbase {
     /**
     * @dev A key has been added to the account.
     */
-    event KeyAdded(address indexed key, uint8 indexed permission);
+    event KeyAdded(address indexed key);
     
     /**
     * @dev A key has been removed from the account.
     */
-    event KeyRemoved(address indexed key, uint8 indexed permission);
+    event KeyRemoved(address indexed key);
+
+    /**
+    * @dev The amount of sigs require to execute a transaction has been updated.
+    */
+    event RequirementChange(uint256 requirement);
 
 }

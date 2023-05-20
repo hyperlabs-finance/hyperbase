@@ -45,7 +45,12 @@ interface IHyperbaseCore {
     /**
      * @dev An approval has been added to a transaction.
      */
-    event Approved(address indexed sender, uint indexed transactionId, bool approved);
+    event Approved(address indexed sender, uint indexed transactionId);
+
+    /**
+     * @dev An key revoked an approval on a transaction.
+     */
+    event Revoked(address indexed sender, uint indexed transactionId);
 
     /**
      * @dev A transaction has been executed.
