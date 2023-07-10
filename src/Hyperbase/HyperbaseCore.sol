@@ -7,6 +7,13 @@ import 'openzeppelin-contracts/contracts/utils/Timers.sol';
 import 'openzeppelin-contracts/contracts/utils/Address.sol';
 import 'openzeppelin-contracts/contracts/utils/math/SafeCast.sol';
 
+/**
+
+  	HyperbaseCore manages the transactions for the Hyperbase account. It records
+    past and pending transactions handles their execution.
+
+ */
+ 
 contract HyperbaseCore is IHyperbaseCore {  
 
   	////////////////
@@ -17,18 +24,18 @@ contract HyperbaseCore is IHyperbaseCore {
     using SafeCast for uint256;
 
   	////////////////
-    // CONSTANTS
+    // STATE
     ////////////////
 
     /**
     * @dev The token used for refunds.
     */
-    address GAS_TOKEN;
+    address gas_token;
 
     /**
     * @dev Expiry period in block time.
     */
-    uint256 EXPIRY_PERIOD;
+    uint256 expiry_period;
 
     /**
     * @dev Executions status of the transaction.
@@ -36,19 +43,15 @@ contract HyperbaseCore is IHyperbaseCore {
     enum Status {
         PENDING,
         CANCELLED,
-        SUBMITTED,
         EXECUTED,
         FAILED
     }
-
-  	////////////////
-    // STATE
-    ////////////////
 
     /**
     * @dev Core transaction details.
     */
     struct Transaction {
+        bool exists;
         uint64 submitted;
         uint64 expires;
         address[] targets;
@@ -58,19 +61,14 @@ contract HyperbaseCore is IHyperbaseCore {
     }
 
     /**
-    * @dev All _transactions from.
-    */
-	Transaction[] internal _transactions;
-
-    /**
     * @dev Mapping from transaction has to transactionId.
     */
-    mapping(uint256 => uint256) internal _transactionsByHash;
+    mapping(uint256 => Transaction) internal _transactionsByHash;
 
     /**
     * @dev Mapping from status to _transaction index.
     */
-    mapping(Status => uint256[]) internal _transactionsByStatus;
+    mapping(Status => uint256[]) internal _transactionHashByStatus;
 
   	////////////////
     // MODIFIERS
@@ -82,7 +80,7 @@ contract HyperbaseCore is IHyperbaseCore {
     modifier transactionPending(
         uint256 txHash
     ) {
-        if (_transactions[_transactionsByHash[txHash]].status != Status.PENDING)
+        if (_transactionsByHash[txHash].status != Status.PENDING)
             revert TransactionNotPending();
         _;
     }
@@ -107,7 +105,7 @@ contract HyperbaseCore is IHyperbaseCore {
         bytes[] memory calldatas
     ) {
         if (targets.length != values.length || values.length != calldatas.length)
-            revert NoTransactionArrayParity();
+            revert TransactionArrayUnequal();
         _;
     }
 
@@ -126,45 +124,36 @@ contract HyperbaseCore is IHyperbaseCore {
         internal
         transactionNotEmpty(targets)
         transactionArrayParity(targets, values, calldatas)
-        returns (uint256)
+        returns (uint256 txHash_)
     {
         // Hash the tx
-        uint256 txHash = getTransactionHash(targets, values, calldatas);
+        uint256 txHash_ = getTransactionHash(targets, values, calldatas);
 
         // Get the block times for now and transaction expiry
         uint64 submitted = block.number.toUint64();
         uint64 expires = submitted + getExpiryPeriod().toUint64();
 
         // If tx exsists then reset/update its fields
-        if (0 < _transactionsByHash[txHash]) {
-
-            _transactions[_transactionsByHash[txHash]].submitted = submitted;
-            _transactions[_transactionsByHash[txHash]].expires = expires;
-
-            _transactions[_transactionsByHash[txHash]].status = Status.PENDING;
-
+        if (_transactionsByHash[txHash_].exists) {
+            _transactionsByHash[txHash_].submitted = submitted;
+            _transactionsByHash[txHash_].expires = expires;
+            _transactionsByHash[txHash_].status = Status.PENDING;
         } 
-        // Else create a new tx 
         else {
-            
             // Create and push to transaction array
-            _transactions.push(Transaction(
+            _transactionsByHash[txHash_] = Transaction(
+                true,
                 submitted,
                 expires,
                 targets,
                 values,
                 calldatas,
                 Status.PENDING
-            ));
-
-            // Transactions by hash
-            _transactionsByHash[txHash] = _transactions.length;
+            );
         }
 
         // Add tx to tx by status
-        _transactionsByStatus[Status.PENDING].push(_transactionsByHash[txHash]);
-
-        return txHash; 
+        _transactionHashByStatus[Status.PENDING].push(txHash_);
     }
 
     /**
@@ -176,42 +165,19 @@ contract HyperbaseCore is IHyperbaseCore {
         internal
         transactionPending(txHash)
     {
-        address[] memory targets = _transactions[txHash].targets;
-        uint256[] memory values = _transactions[txHash].values;
-        bytes[] memory calldatas = _transactions[txHash].calldatas;
+        address[] memory targets = _transactionsByHash[txHash].targets;
+        uint256[] memory values = _transactionsByHash[txHash].values;
+        bytes[] memory calldatas = _transactionsByHash[txHash].calldatas;
 
         // Execute the tx
         string memory errorMessage = "Hyperbase: call reverted without message";
-        for (uint256 i = 0; i < targets.length; ++i) {
+        for (uint8 i = 0; i < targets.length; i++) {
             (bool success, bytes memory returndata) = targets[i].call{value: values[i]}(calldatas[i]);
             Address.verifyCallResult(success, returndata, errorMessage);
         }
     
         // Update the transaction status
-        _transactions[_transactionsByHash[txHash]].status = Status.EXECUTED;
-    }
-
-    /**
-     * @dev Internal cancel a transaction function.
-     */ 
-    function _cancel(
-        uint256 txHash,
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas
-    )
-        internal
-        virtual
-        transactionPending(txHash)
-        returns (uint256)
-    {
-        // Update the transaction status
-        _transactions[_transactionsByHash[txHash]].status = Status.CANCELLED;
-
-        // Event
-        emit Cancelled(txHash, targets, values, calldatas);
-
-        return _transactionsByHash[txHash];
+        _transactionsByHash[txHash].status = Status.EXECUTED;
     }
 
     //////////////////////////////////////////////
@@ -226,7 +192,7 @@ contract HyperbaseCore is IHyperbaseCore {
         view
         returns (uint256)
     {
-        return EXPIRY_PERIOD;
+        return expiry_period;
     }
     
     /**
@@ -238,52 +204,81 @@ contract HyperbaseCore is IHyperbaseCore {
         bytes[] memory calldatas
     )
         public
-        pure 
+        view
         returns (uint256)
     {
         return uint256(keccak256(abi.encode(targets, values, calldatas)));
     }
     
     /**
-     * @dev Returns total number of transactions after filters are applied.
+     * @dev Returns list of pending transactions.
      */ 
-    function getTransactionCount(
-        bool pending,
-        bool executed
-    )
+    function getPendingTransactions()
         public
-        view
-        returns (uint8 approvalCount)
+        returns(uint256[] memory)
     {
-        for (uint256 i = 0; i <  _transactions.length; i++)
-            if (pending && _transactions[i].status == Status.PENDING || executed && _transactions[i].status == Status.EXECUTED)
-                approvalCount++;
+        return _transactionHashByStatus[Status.PENDING];
     }
 
     /**
-     * @dev Returns list of transaction IDs in defined range.
+     * @dev Returns list of pending transactions.
      */ 
-    function getTransactionIds(
-        uint256 from,
-        uint256 to,
-        bool pending,
-        bool executed
+    function getPendingTransaction()
+        public
+        returns(uint256[] memory)
+    {
+        return _transactionHashByStatus[Status.PENDING];
+    }
+
+    /**
+     * @dev Returns list of executed transactions.
+     */ 
+    function getExecutedTransactions()
+        public
+        returns(uint256[] memory)
+    {
+        return _transactionHashByStatus[Status.EXECUTED];
+    }
+
+    /**
+     * @dev Returns the details for a transaction.
+     */
+    function getTransaction(
+        uint256 txHash
     )
         public
         view
-        returns (uint256[] memory txHashs)
+        returns (
+            bool exists,
+            uint64 submitted,
+            uint64 expires,
+            address[] memory targets,
+            uint256[] memory values,
+            bytes[] memory calldatas,
+            uint256 status
+        )
     {
-        uint256[] memory txHashsTemp = new uint256[](_transactions.length);
-        uint8 approvalCount = 0;
-        for (uint256 i = 0; i < _transactions.length; i++) {
-            if (pending && _transactions[i].status == Status.PENDING || executed && _transactions[i].status == Status.EXECUTED) {
-                txHashsTemp[approvalCount] = i;
-                approvalCount++;
-            }
-        }
-        txHashs = new uint256[](to - from);
-        for (uint256 i = from; i < to; i++)   
-            txHashs[i - from] = txHashsTemp[i];
+        exists = _transactionsByHash[txHash].exists;
+        submitted = _transactionsByHash[txHash].submitted;
+        expires = _transactionsByHash[txHash].expires;
+        targets = _transactionsByHash[txHash].targets;
+        values = _transactionsByHash[txHash].values;
+        calldatas = _transactionsByHash[txHash].calldatas;
+        status = uint256(_transactionsByHash[txHash].status);
+    }
+
+    //////////////////////////////////////////////
+    // CHECKS
+    //////////////////////////////////////////////
+
+    function checkTransactionExists(
+        uint256 txHash
+    )
+        public
+        view
+        returns(bool)
+    {
+        return _transactionsByHash[txHash].exists;
     }
 
 }

@@ -7,7 +7,7 @@
     },
     {
       "inputs": [],
-      "name": "KeyDoesNotExists",
+      "name": "KeyDoesNotExist",
       "type": "error"
     },
     {
@@ -88,19 +88,19 @@
   "methodIdentifiers": {},
   "ast": {
     "absolutePath": "/mnt/c/Users/44783/Desktop/PROJECTS/hypersurface/hyperbase/src/Interface/IHyperbase.sol",
-    "id": 32138,
+    "id": 31018,
     "exportedSymbols": {
       "IHyperbase": [
-        32137
+        31017
       ]
     },
     "nodeType": "SourceUnit",
-    "src": "39:1290:31",
+    "src": "39:1289:25",
     "nodes": [
       {
-        "id": 32100,
+        "id": 30980,
         "nodeType": "PragmaDirective",
-        "src": "39:23:31",
+        "src": "39:23:25",
         "literals": [
           "solidity",
           "^",
@@ -109,178 +109,178 @@
         ]
       },
       {
-        "id": 32137,
+        "id": 31017,
         "nodeType": "ContractDefinition",
-        "src": "66:1263:31",
+        "src": "66:1262:25",
         "nodes": [
           {
-            "id": 32103,
+            "id": 30983,
             "nodeType": "ErrorDefinition",
-            "src": "230:17:31",
+            "src": "230:17:25",
             "documentation": {
-              "id": 32101,
+              "id": 30981,
               "nodeType": "StructuredDocumentation",
-              "src": "156:68:31",
+              "src": "156:68:25",
               "text": " @dev Only this contract can call these functions."
             },
             "errorSelector": "f8d8ab0e",
             "name": "OnlyThis",
-            "nameLocation": "236:8:31",
+            "nameLocation": "236:8:25",
             "parameters": {
-              "id": 32102,
+              "id": 30982,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "244:2:31"
+              "src": "244:2:25"
             }
           },
           {
-            "id": 32106,
+            "id": 30986,
             "nodeType": "ErrorDefinition",
-            "src": "335:18:31",
+            "src": "335:18:25",
             "documentation": {
-              "id": 32104,
+              "id": 30984,
               "nodeType": "StructuredDocumentation",
-              "src": "263:66:31",
+              "src": "263:66:25",
               "text": " @dev Key has already been added to the account."
             },
             "errorSelector": "adb8cab5",
             "name": "KeyExists",
-            "nameLocation": "341:9:31",
+            "nameLocation": "341:9:25",
             "parameters": {
-              "id": 32105,
+              "id": 30985,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "350:2:31"
+              "src": "350:2:25"
             }
           },
           {
-            "id": 32109,
+            "id": 30989,
             "nodeType": "ErrorDefinition",
-            "src": "429:25:31",
+            "src": "429:24:25",
             "documentation": {
-              "id": 32107,
+              "id": 30987,
               "nodeType": "StructuredDocumentation",
-              "src": "361:62:31",
+              "src": "361:62:25",
               "text": " @dev Key has not been added to the account."
             },
-            "errorSelector": "492f94d5",
-            "name": "KeyDoesNotExists",
-            "nameLocation": "435:16:31",
+            "errorSelector": "e57b6304",
+            "name": "KeyDoesNotExist",
+            "nameLocation": "435:15:25",
             "parameters": {
-              "id": 32108,
+              "id": 30988,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "451:2:31"
+              "src": "450:2:25"
             }
           },
           {
-            "id": 32112,
+            "id": 30992,
             "nodeType": "ErrorDefinition",
-            "src": "529:23:31",
+            "src": "528:23:25",
             "documentation": {
-              "id": 32110,
+              "id": 30990,
               "nodeType": "StructuredDocumentation",
-              "src": "462:61:31",
+              "src": "461:61:25",
               "text": " @dev Key has not approved the transaction."
             },
             "errorSelector": "2bdada0a",
             "name": "KeyNotApproved",
-            "nameLocation": "535:14:31",
+            "nameLocation": "534:14:25",
             "parameters": {
-              "id": 32111,
+              "id": 30991,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "549:2:31"
+              "src": "548:2:25"
             }
           },
           {
-            "id": 32115,
+            "id": 30995,
             "nodeType": "ErrorDefinition",
-            "src": "631:20:31",
+            "src": "630:20:25",
             "documentation": {
-              "id": 32113,
+              "id": 30993,
               "nodeType": "StructuredDocumentation",
-              "src": "560:65:31",
+              "src": "559:65:25",
               "text": " @dev Key has already approved the transaction."
             },
             "errorSelector": "bfc00463",
             "name": "KeyApproved",
-            "nameLocation": "637:11:31",
+            "nameLocation": "636:11:25",
             "parameters": {
-              "id": 32114,
+              "id": 30994,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "648:2:31"
+              "src": "647:2:25"
             }
           },
           {
-            "id": 32118,
+            "id": 30998,
             "nodeType": "ErrorDefinition",
-            "src": "709:23:31",
+            "src": "708:23:25",
             "documentation": {
-              "id": 32116,
+              "id": 30996,
               "nodeType": "StructuredDocumentation",
-              "src": "659:44:31",
+              "src": "658:44:25",
               "text": " @dev Key is zero address."
             },
             "errorSelector": "2adfb711",
             "name": "KeyZeroAddress",
-            "nameLocation": "715:14:31",
+            "nameLocation": "714:14:25",
             "parameters": {
-              "id": 32117,
+              "id": 30997,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "729:2:31"
+              "src": "728:2:25"
             }
           },
           {
-            "id": 32121,
+            "id": 31001,
             "nodeType": "ErrorDefinition",
-            "src": "852:30:31",
+            "src": "851:30:25",
             "documentation": {
-              "id": 32119,
+              "id": 30999,
               "nodeType": "StructuredDocumentation",
-              "src": "740:106:31",
+              "src": "739:106:25",
               "text": " @dev Change would result in inadequate keys on the account, either too many or too few."
             },
             "errorSelector": "4c47aba1",
             "name": "KeyRequirementInvalid",
-            "nameLocation": "858:21:31",
+            "nameLocation": "857:21:25",
             "parameters": {
-              "id": 32120,
+              "id": 31000,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "879:2:31"
+              "src": "878:2:25"
             }
           },
           {
-            "id": 32126,
+            "id": 31006,
             "nodeType": "EventDefinition",
-            "src": "1016:36:31",
+            "src": "1015:36:25",
             "anonymous": false,
             "documentation": {
-              "id": 32122,
+              "id": 31002,
               "nodeType": "StructuredDocumentation",
-              "src": "950:60:31",
+              "src": "949:60:25",
               "text": " @dev A key has been added to the account."
             },
             "eventSelector": "654abba5d3170185ed25c9b41f7d2094db3643986b05e9e9cab37028b800ad7e",
             "name": "KeyAdded",
-            "nameLocation": "1022:8:31",
+            "nameLocation": "1021:8:25",
             "parameters": {
-              "id": 32125,
+              "id": 31005,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 32124,
+                  "id": 31004,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "key",
-                  "nameLocation": "1047:3:31",
+                  "nameLocation": "1046:3:25",
                   "nodeType": "VariableDeclaration",
-                  "scope": 32126,
-                  "src": "1031:19:31",
+                  "scope": 31006,
+                  "src": "1030:19:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -288,10 +288,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 32123,
+                    "id": 31003,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1031:7:31",
+                    "src": "1030:7:25",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -301,37 +301,37 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1030:21:31"
+              "src": "1029:21:25"
             }
           },
           {
-            "id": 32131,
+            "id": 31011,
             "nodeType": "EventDefinition",
-            "src": "1134:38:31",
+            "src": "1133:38:25",
             "anonymous": false,
             "documentation": {
-              "id": 32127,
+              "id": 31007,
               "nodeType": "StructuredDocumentation",
-              "src": "1064:64:31",
+              "src": "1063:64:25",
               "text": " @dev A key has been removed from the account."
             },
             "eventSelector": "d2b2d9609b634ccc6f93482de9f8431ec6222fed4fa3cfca3b2a7e1a96a924ae",
             "name": "KeyRemoved",
-            "nameLocation": "1140:10:31",
+            "nameLocation": "1139:10:25",
             "parameters": {
-              "id": 32130,
+              "id": 31010,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 32129,
+                  "id": 31009,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "key",
-                  "nameLocation": "1167:3:31",
+                  "nameLocation": "1166:3:25",
                   "nodeType": "VariableDeclaration",
-                  "scope": 32131,
-                  "src": "1151:19:31",
+                  "scope": 31011,
+                  "src": "1150:19:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -339,10 +339,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 32128,
+                    "id": 31008,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1151:7:31",
+                    "src": "1150:7:25",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -352,37 +352,37 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1150:21:31"
+              "src": "1149:21:25"
             }
           },
           {
-            "id": 32136,
+            "id": 31016,
             "nodeType": "EventDefinition",
-            "src": "1279:45:31",
+            "src": "1278:45:25",
             "anonymous": false,
             "documentation": {
-              "id": 32132,
+              "id": 31012,
               "nodeType": "StructuredDocumentation",
-              "src": "1180:93:31",
+              "src": "1179:93:25",
               "text": " @dev The amount of sigs require to execute a transaction has been updated."
             },
             "eventSelector": "a3f1ee9126a074d9326c682f561767f710e927faa811f7a99829d49dc421797a",
             "name": "RequirementChange",
-            "nameLocation": "1285:17:31",
+            "nameLocation": "1284:17:25",
             "parameters": {
-              "id": 32135,
+              "id": 31015,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 32134,
+                  "id": 31014,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "requirement",
-                  "nameLocation": "1311:11:31",
+                  "nameLocation": "1310:11:25",
                   "nodeType": "VariableDeclaration",
-                  "scope": 32136,
-                  "src": "1303:19:31",
+                  "scope": 31016,
+                  "src": "1302:19:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -390,10 +390,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 32133,
+                    "id": 31013,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1303:7:31",
+                    "src": "1302:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -402,7 +402,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1302:21:31"
+              "src": "1301:21:25"
             }
           }
         ],
@@ -413,23 +413,23 @@
         "contractKind": "interface",
         "fullyImplemented": true,
         "linearizedBaseContracts": [
-          32137
+          31017
         ],
         "name": "IHyperbase",
-        "nameLocation": "76:10:31",
-        "scope": 32138,
+        "nameLocation": "76:10:25",
+        "scope": 31018,
         "usedErrors": [
-          32103,
-          32106,
-          32109,
-          32112,
-          32115,
-          32118,
-          32121
+          30983,
+          30986,
+          30989,
+          30992,
+          30995,
+          30998,
+          31001
         ]
       }
     ],
     "license": "GPL-3.0"
   },
-  "id": 31
+  "id": 25
 }

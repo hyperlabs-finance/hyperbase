@@ -5,6 +5,15 @@ pragma solidity ^0.8.6;
 import 'openzeppelin-contracts/contracts/metatx/MinimalForwarder.sol';
 import 'openzeppelin-contracts/contracts/access/ownable.sol';
 
+/**
+
+  	HyperbaseForwarder allows users to execute transactions from their Hyperbase
+	account without needing network tokens (ETH, MATIC). Transactions may be
+	executed for free, or the gas for the transaction may be refunded using 
+	the Hypersurface network token.
+
+ */
+ 
 contract HyperbaseForwarder is MinimalForwarder, Ownable {
 
   	////////////////
@@ -33,8 +42,7 @@ contract HyperbaseForwarder is MinimalForwarder, Ownable {
 	constructor(
 		address paymentToken,
 		uint8 txFeePercentage
-	)
-	{
+	) {
 		_paymentToken = paymentToken;
 		_txFeePercentage = txFeePercentage;
 	}

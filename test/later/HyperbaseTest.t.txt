@@ -1,0 +1,77 @@
+// SPDX-License-Identifier: UNLICENSED
+
+pragma solidity ^0.8.13;
+
+import "forge-std/Test.sol";
+import "forge-std/Vm.sol";
+
+import "./utils/Utils.sol";
+
+import "../src/Hyperbase/Hyperbase.sol";
+
+contract HyperbaseTest is Test {
+    
+    // Utils
+    Utils public _utils;
+
+    // Compliance
+    Hyperbase public _hyperbase;
+
+    // Keys
+    uint256 _noKeys = 4;
+    address[] public _keys;
+
+    // Set up
+    function setUp() public {
+
+        // Get utils
+        _utils = new Utils();
+
+        // Create testing payees
+        _keys = _utils.createUsers(_noKeys);
+
+        address thisContract = address(this);
+
+        vm.prank(_keys[0]);
+
+        // Compliance 
+		_hyperbase = new Hyperbase(thisContract);
+
+    }
+
+
+    /**
+    function testAddKey() public {
+        
+        address[] memory startKeys = _hyperbase.getKeys();
+
+        assertTrue(_keys[0] == startKeys[0], "Hyperbase: keys mismatch");
+
+        for (uint8 i = 1; i < _keys.length; i++) {
+
+            // Create a list of targets
+            address[] memory _targets = new address[](1);
+            _targets[0] = address(_hyperbase);
+
+            // Create a list of values
+            uint256[] memory _values = new uint256[](1);
+            _values[0] = 0;
+
+            // Create a list of calldatas
+            bytes[] memory _calldatas = new bytes[](1);
+            // Call the store function in the Box.sol contract with the value 5
+            _calldatas[0] = abi.encodeWithSignature("addKey(address)", _keys[i]);
+
+            // Call the proposal function on the governor contract with the fields `targets`, `values`, `calldatas` 
+            _hyperbase.submit(
+                _targets, // targets
+                _values, // values
+                _calldatas // calldatas
+            );
+
+            // Execution should be automatic
+        }
+    }
+    */
+
+}

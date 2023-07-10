@@ -2,69 +2,16 @@
 
 **Welcome to Hyperbase: a secure, lightweight multi-factor smart contract account.**
 
-## What is Hyperbase?
-
 Hyperbase is a lightweight multi-factor smart contract that enables users to hold digital assets and participate in identity-driven interactions. Instead of expecting newcomers to educate themselves on security best practices Hyperbase is secure by design. High-risk decisions are safeguarded by multi-factor authentication, either requiring the approval of multiple devices or the approval of multiple team members. 
 
-Associated with Hyperbase accounts is the Hyperbase identity suite, a series of tools for creating digital identities. Using claims, signed attestations asserting that an account has some attribute or attributes, users can build digital identities that allow them to automate compliance checks and participate in credential-based interactions.
+## Hyperbase.sol
 
-## Hyperbase
+Hyperbase handles key management for the smart contract account, functioning like a multi-signature wallet. Each key for the wallet is a context-specific key pair stored locally on the users device. When new devices are added a key is  created locally and permission is requested from another key on the account to  add the new device/key to the Hyperbase account.
 
-Blockchain technology today is much like the first generation of the web. While the technical infrastructure is established and capable of supporting use at scale, a relatively small number of key usability issues present a far greater barrier to adoption than the underlying technology. Even in 2022, blockchain applications make little provision for non-technical users. This design philosophy is perhaps best summarised as “By developers, for developers”.
+## HyperbaseCore.sol
 
-It is our conclusion that for blockchain-based applications to achieve mainstream commercial success the technical infrastructure must be all but invisible to users. Understanding the blockchain must be an optional extra for those who wish to engage on a more sophisticated level, rather than a necessity for anyone who wishes to participate. While many blockchain enthusiasts are fervent believers in the importance of self-custody, it is important to recognise that for the average user simplicity is a greater priority than control. If we do not bare recognise this when designing blockchain applications we will end drive users into the arms of centralised and non-custodial services. 
+HyperbaseCore manages the transactions for the Hyperbase account. It records past and pending transactions handles their execution.
 
-Furthermore, in the current paradigm accounts are made and disposed of at will. Privacy may be of great importance but the throwaway nature of blockchain accounts has prevented the space from evolving. Without being able to make any meaningful assumptions about the person behind the account it has proven impractical to create user-oriented experiences or support registered assets. 
+## HyperbaseForwarder.sol
 
-Our solution is Hyperbase, a smart contract account and digital identity and credentialling solution. Hyperbase accounts provide drastic improvements over current designs by abstracting all the riskiest, most intimidating, and otherwise inconvenient aspects out of the user experience. Importantly, Hyperbase does so while maintaining the full benefits of decentralisation. This is essential as it ensures that assets belong to their owner and no one else. 
-
-#### Smart Contract Account
-
-At the core of Hyperbase is a smart contract wallet that functions as a proxy account contract, whereby users may execute transactions. Associated with the account is a key-value store that records an arbitrary number of keys. Any one of these keys may submit a transaction from the account.
-
-#### Multi-sig
-
-In order to execute a submitted transaction the account requires the approval of at least one other key. The benefit of requiring multiple-signatures is that it both reduces the risk of single-point failures and creates a multi-factor authentication process for higher-risk transactions. Users may configure how many approvals are required based on the operation type.
-
-#### Subdomain Identifiers
-
-Users have come to expect accounts to be identified by names, usernames, handles or email addresses, all of which provide identification in a simple, comprehensible format. Rather than being identified by a 42-character public key, Hyperbase accounts and objects are identified by subdomains giving users a clear, comprehensible handle for interactions.
-
-#### Local Keys
-
-In order to create a simple, accessible experience while preserving self-custody and ensuring that users have direct control over their assets, Hypersurface uses numerous disposable context-specific key pairs. These key pairs are, in effect, standard externally owned account (“EOA”) wallets. Where they differ from standard EOA's is that they are only used to sign transactions locally. As such, these EOA accounts never hold any funds, which are instead held by the user's core identity account. When a user attempts to access their identity account on a new device, a new key pair is created and stored locally on the user's device. Permission is then requested on the identity account from the existing keys to add the new key. This request must then be approved. Once the key is approved it is added to the account.
-
-#### Meta Transactions
-
-A significant barrier to the adoption of blockchain-based applications is the requirement for network fees (“gas”) to be paid on any given transaction. Gas fees present a barrier to onboarding as users must first purchase network tokens or hold multiple tokens for a single transaction. Meta transactions, often known as relays, are a powerful mechanism that bypasses the need for the (direct) payment of network fees.
-
-Meta transactions allow users to sign messages showing intent but allow a third-party relayer to execute the transaction itself. A payment in the network token will always be necessary to execute a transaction, therefore meta transactions are not technically gasless, however, they do allow a third party to foot the bill. Hyperbase uses the relay to bypass gas fees on all transactions that are covered externally by its revenue model.
-
-In order to execute a transaction from a Hyperbase user account:
-1. A request is generated in the browser for a transaction the user would like to execute.
-2. The transaction request is signed with their local private key.
-3. The transaction request is sent to the Hypersurface relay.
-4. The relay wraps the transaction request within another transaction (meta transaction) and submits the transaction to the identity account contract.
-5. The identity account contract unwraps the meta-transaction and executes the transaction requested by the user.
-
-### Account Access
-
-To access a user account the user inputs a personal account subdomain: “alice.smith.hypersurf”
-	a. If the user has an account and key:
-		i. The local key is used to sign and send the transaction via relay.
-	b. If the user has an account but no key:
-		i. A new local key is generated and stored on the device.
-		ii. The local key is then added as a new signer to a relay transaction.
-		iii. This transaction is then confirmed and sent from a key with the appropriate permissions. For example, a user may sign the transaction by adding their smartphone from their laptop.
-	c. If the user does not have an account:
-		i. A new local key is generated and stored on the device.
-		ii. A new Hyperbase account is deployed to the blockchain via relay, with the local key added as having top-level privileges.
-		iii. The user-selected ENS subdomain is registered to the user's account address.
-
-## Digital Identities
-
-As a platform for regulated interactions identity plays a fundamental role in the Hypersurface protocol. Identity is crucial in allowing (1) users to engage with one another online with confidence, (2) creating binding legal agreements between parties and (3) enabling smart contracts to validate credentials, thereby automating the process of compliance.
-
-Verifiable digital identities create a powerful resource that enables users to engage broadly across investment, ownership, and governance on the blockchain. Identities are persistent, meaning they may only need to be verified once to open an entire network of opportunities. In this sense, an identity account can be thought of as a digital ID card. Not only is it valid across opportunities but with further standardisation it may be used across the blockchain ecosystem.
-
-Blockchain-based identity accounts enable information to be verified near-instantly by smart contracts. This has significant implications for issuers as it enables the process of compliance and transfer controls to be automated and enforced at the protocol level. With trust secured by a tamper-proof digital environment, compliant parties can participate with greatly reduced friction. There have been a variety of notable attempts over the years to create digital accounts, all of which have fallen short in one way or another. Ideally, accounts would be secure, self-sovereign, identity-driven, and more broadly compatible with the blockchain ecosystem—all while maintaining the simplicity to onboard first-time users.
+HyperbaseForwarder allows users to execute transactions from their Hyperbase account without needing network tokens (ETH, MATIC). Transactions may be executed for free, or the gas for the transaction may be refunded using  the Hypersurface network token.

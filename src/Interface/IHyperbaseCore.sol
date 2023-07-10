@@ -31,7 +31,7 @@ interface IHyperbaseCore {
     /**
      * @dev Transaction arrays have unequal lengths.
      */
-    error NoTransactionArrayParity();
+    error TransactionArrayUnequal();
 
   	////////////////
     // EVENTS

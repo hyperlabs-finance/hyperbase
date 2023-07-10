@@ -8,6 +8,16 @@ import 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import './HyperbaseCore.sol';
 import '../Interface/IHyperbase.sol';
 
+/**
+
+  	Hyperbase handles key management for the smart contract account, functioning
+    like a multi-signature wallet. Each key for the wallet is a context-specific key
+    pair stored locally on the users device. When new devices are added a key is 
+    created locally and permission is requested from another key on the account to 
+    add the new device/key to the Hyperbase account.
+
+ */
+
 contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {  
 
   	////////////////
@@ -44,9 +54,9 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     mapping(address => bool) _keyExistsByAddress;
 
     /**
-    * @dev Mapping from transaction index to adress to approval status.
+    * @dev Mapping from transaction hash to adress to approval status.
     */
-    mapping(uint256 => mapping(address => bool)) private _approvalsByTransaction;
+    mapping(uint256 => mapping(address => bool)) private _approvalsByTransactionHash;
 
   	////////////////
     // CONSTRUCTOR
@@ -60,7 +70,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         // Push to transaction array
         _keys.push(_msgSender());
 
-        _keysByAddress[_msgSender()] = _keys.length;
+        _keysByAddress[_msgSender()] = _keys.length - 1;
 	}
 
   	////////////////
@@ -94,7 +104,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
 		address key
 	) {
         if (!_keyExistsByAddress[key])
-            revert KeyDoesNotExists();
+            revert KeyDoesNotExist();
         _;
     }
 
@@ -105,7 +115,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
 		uint256 txHash,
 		address key
 	) {
-        if (!_approvalsByTransaction[_transactionsByHash[txHash]][key])
+        if (!_approvalsByTransactionHash[txHash][key])
             revert KeyNotApproved();
         _;
     }
@@ -117,7 +127,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
 		uint256 txHash,
 		address key
 	) {
-        if (_approvalsByTransaction[_transactionsByHash[txHash]][key])
+        if (_approvalsByTransactionHash[txHash][key])
             revert KeyApproved();
         _;
     }
@@ -232,7 +242,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         transactionPending(txHash)
     {
         // Set approved
-        _approvalsByTransaction[_transactionsByHash[txHash]][_msgSender()] = true;   
+        _approvalsByTransactionHash[txHash][_msgSender()] = true;   
 
         // Event
         emit Approved(_msgSender(), txHash);
@@ -253,7 +263,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         transactionPending(txHash)
     {
         // Revoke approval
-        _approvalsByTransaction[_transactionsByHash[txHash]][_msgSender()] = false;
+        _approvalsByTransactionHash[txHash][_msgSender()] = false;
 
         // Event 
         emit Revoked(_msgSender(), txHash);
@@ -268,10 +278,10 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         internal
     {
         // If tx already exists
-        if (0 < _transactionsByHash[txHash])
+        if (_transactionsByHash[txHash].exists)
             // Iterate through all keys on the account and set as false
             for (uint8 i = 0; i < _keys.length; i++)
-                _approvalsByTransaction[_transactionsByHash[txHash]][_keys[i]] = false;       
+                _approvalsByTransactionHash[txHash][_keys[i]] = false;       
     }
 
     //////////////////////////////////////////////
@@ -324,7 +334,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
             _execute(txHash);
                 
             // Event
-            emit Executed(txHash, _transactions[txHash].targets, _transactions[txHash].values, _transactions[txHash].calldatas);
+            emit Executed(txHash, _transactionsByHash[txHash].targets, _transactionsByHash[txHash].values, _transactionsByHash[txHash].calldatas);
         }
     }
 
@@ -364,7 +374,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
     }
     
     /**
-     * @dev Returns number of `_approvalsByTransaction` for a transaction.
+     * @dev Returns number of `_approvalsByTransactionHash` for a transaction.
      */
     function getApprovalCount(
         uint256 txHash
@@ -374,7 +384,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         returns (uint8 approvalCount)
     {
         for (uint256 i = 0; i < _keys.length; i++)
-            if (_approvalsByTransaction[_transactionsByHash[txHash]][_keys[i]])
+            if (_approvalsByTransactionHash[txHash][_keys[i]])
                 approvalCount++;
     }
     
@@ -391,7 +401,7 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         address[] memory _approvalsByTransactionTemp = new address[](_keys.length);
         uint8 approvalCount = 0;
         for (uint256 i = 0; i < _keys.length; i++) {
-            if (_approvalsByTransaction[_transactionsByHash[txHash]][_keys[i]]) {
+            if (_approvalsByTransactionHash[txHash][_keys[i]]) {
                 _approvalsByTransactionTemp[approvalCount] = _keys[i];
                 approvalCount++;
             }
@@ -399,6 +409,17 @@ contract Hyperbase is IHyperbase, HyperbaseCore, ERC2771Context {
         approvalsByTransaction = new address[](approvalCount);
         for (uint256 i = 0; i < approvalCount; i++)
             approvalsByTransaction[i] = _approvalsByTransactionTemp[i];
+    }
+
+    /**
+     * @dev Returns array with `_key` addresses.
+     */
+    function getKeys()
+        public
+        view
+        returns (address[] memory)
+    {
+        return _keys;
     }
 
     //////////////////////////////////////////////

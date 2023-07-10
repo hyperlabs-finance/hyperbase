@@ -21,7 +21,7 @@ interface IHyperbase {
     /**
     * @dev Key has not been added to the account.
     */
-    error KeyDoesNotExists();
+    error KeyDoesNotExist();
 
     /**
     * @dev Key has not approved the transaction.
